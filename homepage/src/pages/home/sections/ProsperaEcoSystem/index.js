@@ -7,7 +7,7 @@ import MKTypography from "components/MKTypography";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import gsap from "gsap";
-import bgImage from "./pebg1.png";
+import bgImage from "./pebg.png";
 import colors from "assets/theme/base/colors";
 
 const FeatureBox = ({ title, description, color, sx }) => (
