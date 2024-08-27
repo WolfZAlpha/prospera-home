@@ -1,0 +1,31 @@
+{
+  "apps": [
+    {
+      "name": "prospera-api",
+      "script": "./src/index.js",
+      "cwd": "./server",
+      "node_args": "--es-module-specifier-resolution=node",
+      "watch": false,
+      "force": true,
+      "env": {
+        "PORT": 8080,
+        "NODE_ENV": "production",
+        "DB_LINK": "mongodb+srv://doapps-601b68d4-8bd7-42cf-9f41-46f8be378f6d:LAIs9k01dp4762q5@db-mongodb-nyc1-83629-6a0bd76f.mongo.ondigitalocean.com/admin?authSource=admin&tls=true",
+        "DB_HOST": "db-mongodb-nyc1-83629-6a0bd76f.mongo.ondigitalocean.com",
+        "DB_PORT": "27017",
+        "DB_USER": "doapps-601b68d4-8bd7-42cf-9f41-46f8be378f6d",
+        "DB_PASSWORD": "LAIs9k01dp4762q5",
+        "DB_NAME": "admin",
+        "JWT_SECRET": "30dc73af4750af81a83562fec01d0795c88478e10b396710e6bbe019be2c0386fb048d878746ae4011e9c2dad0260252123e90e01fde066bae1a7b1f5f4920f4c7b8187e75c15c656770ce2a60534d5f123178f05f5f9254df4b34142cd7e77922db425a6132e51e004182e7332dc1624ab4b3839c535ac7b1391457d3ea9f72",
+        "APP_URL_CLIENT": "https://www.prosperadefi.com",
+        "APP_URL_API": "https://api.prosperadefi.com",
+        "APP_URL_DASHBOARD": "https://dashboard.prosperadefi.com",
+        "APP_URL_VR": "https://vr.prosperadefi.com",
+        "MAILTRAP_HOST": "live.smtp.mailtrap.io",
+        "MAILTRAP_PORT": "587",
+        "MAILTRAP_USER": "api",
+        "MAILTRAP_PASS": "03215ebc81b1c94c07faa9a5bc383ba7"
+      }
+    }
+  ]
+}

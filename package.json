@@ -1,0 +1,39 @@
+{
+  "name": "prospera-platform",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "homepage",
+    "server"
+  ],
+  "scripts": {
+    "start": "node server/src/index.js",
+    "start:dev": "concurrently \"npm run start:server\" \"npm run start:homepage\"",
+    "start:server": "cd server && npm run start:dev",
+    "start:homepage": "cd homepage && npm start",
+    "build": "npm run build:homepage",
+    "build:homepage": "cd homepage && npm run build",
+    "install:all": "npm install && npm run install:homepage && npm run install:server",
+    "install:homepage": "cd homepage && npm install",
+    "install:server": "cd server && npm install",
+    "lint": "npm run lint:homepage && npm run lint:server",
+    "lint:homepage": "cd homepage && npm run lint",
+    "lint:server": "cd server && eslint .",
+    "prettify": "npm run prettify:homepage && npm run prettify:server",
+    "prettify:homepage": "cd homepage && npm run prettify",
+    "prettify:server": "cd server && prettier --write ."
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.1",
+    "eslint": "^8.38.0",
+    "prettier": "^2.8.7"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "jose": "^5.7.0",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
