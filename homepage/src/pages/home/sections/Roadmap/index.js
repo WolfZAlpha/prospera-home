@@ -63,7 +63,7 @@ const RoadmapContainer = styled(Container)({
 });
 
 const RoadmapItem = styled(Box)(({ theme, color }) => ({
-  background: "rgba(0, 0, 51, 0.7)",
+  background: "rgba(0, 0, 0, 0.7)",
   padding: theme.spacing(3),
   borderRadius: theme.spacing(2),
   border: `1px solid ${color}`,
