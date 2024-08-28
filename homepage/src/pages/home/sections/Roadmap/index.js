@@ -127,7 +127,7 @@ const WireframeLandscape = () => {
       const frequency = 0.01;
 
       // Set the stroke style to a semi-transparent green color
-      ctx.strokeStyle = "rgba(1, 255, 2, 0.75)"; // 75% opacity
+      ctx.strokeStyle = "rgba(1, 255, 2, 0.25)"; // 75% opacity
       ctx.lineWidth = 1;
 
       for (let x = 0; x < canvas.width + gridSize; x += gridSize) {
