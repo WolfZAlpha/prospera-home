@@ -1,6 +1,10 @@
 import React from "react";
-import { Container, Typography, Box, Grid } from "@mui/material";
-import { styled, keyframes } from "@mui/material/styles";
+import { Container, Typography, Box, Grid, useMediaQuery } from "@mui/material";
+import { styled, keyframes, useTheme } from "@mui/material/styles";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination } from "swiper";
+import "swiper/css";
+import "swiper/css/pagination";
 
 const glowAnimation = keyframes`
   0%, 100% { box-shadow: 0 0 5px currentColor, 0 0 10px currentColor; }
@@ -76,7 +80,7 @@ const RoadmapItem = styled(Box)(({ theme, color }) => ({
 
 const StageTitle = styled(Typography)(({ theme }) => ({
   fontFamily: "Roboto, sans-serif",
-  fontSize: theme.typography.pxToRem(14),
+  fontSize: theme.typography.pxToRem(16),
   fontWeight: 700,
   marginBottom: theme.spacing(2),
   color: "#01ff02",
@@ -90,7 +94,8 @@ const StageList = styled("ul")(({ theme }) => ({
   "& li": {
     fontFamily: "Roboto, sans-serif",
     marginBottom: theme.spacing(1),
-    fontSize: theme.typography.pxToRem(10),
+    fontSize: theme.typography.pxToRem(14),
+    fontWeight: 500,
     position: "relative",
     paddingLeft: theme.spacing(3),
     color: "#ffffff",
@@ -103,6 +108,16 @@ const StageList = styled("ul")(({ theme }) => ({
       transform: "translateY(-50%)",
       fontSize: theme.typography.pxToRem(18),
     },
+  },
+}));
+
+const StyledSwiper = styled(Swiper)(({ theme }) => ({
+  padding: theme.spacing(2, 0),
+  ".swiper-pagination-bullet": {
+    background: "#01ff02",
+  },
+  ".swiper-pagination-bullet-active": {
+    background: "#01ff02",
   },
 }));
 
@@ -192,6 +207,9 @@ const WireframeLandscape = () => {
 };
 
 const Roadmap = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const roadmapData = [
     {
       stage: "Stage 1",
@@ -279,7 +297,7 @@ const Roadmap = () => {
       </FlowingLine>
       <RoadmapContainer>
         <Typography
-          variant="h5"
+          variant="h1"
           align="center"
           gutterBottom
           sx={{
@@ -307,22 +325,46 @@ const Roadmap = () => {
           Embark on a journey through our visionary blockchain infrastructure, paving the way for
           unprecedented growth and innovation.
         </Typography>
-        <Grid container spacing={4} position="relative">
-          {roadmapData.map((item, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index} sx={{ mb: 4 }}>
-              <RoadmapItem color={item.color}>
-                <StageTitle>
-                  {item.stage} <br /> {item.date}
-                </StageTitle>
-                <StageList>
-                  {item.items.map((listItem, listIndex) => (
-                    <li key={listIndex}>{listItem}</li>
-                  ))}
-                </StageList>
-              </RoadmapItem>
-            </Grid>
-          ))}
-        </Grid>
+        {isMobile ? (
+          <StyledSwiper
+            modules={[Pagination]}
+            spaceBetween={30}
+            slidesPerView={1}
+            pagination={{ clickable: true }}
+          >
+            {roadmapData.map((item, index) => (
+              <SwiperSlide key={index}>
+                <RoadmapItem color={item.color}>
+                  <StageTitle>
+                    {item.stage} <br /> {item.date}
+                  </StageTitle>
+                  <StageList>
+                    {item.items.map((listItem, listIndex) => (
+                      <li key={listIndex}>{listItem}</li>
+                    ))}
+                  </StageList>
+                </RoadmapItem>
+              </SwiperSlide>
+            ))}
+          </StyledSwiper>
+        ) : (
+          <Grid container spacing={4} position="relative">
+            {roadmapData.map((item, index) => (
+              <Grid item xs={12} sm={6} md={4} key={index} sx={{ mb: 4 }}>
+                <RoadmapItem color={item.color}>
+                  <StageTitle>
+                    {item.stage} <br /> {item.date}
+                  </StageTitle>
+                  <StageList>
+                    {item.items.map((listItem, listIndex) => (
+                      <li key={listIndex}>{listItem}</li>
+                    ))}
+                  </StageList>
+                </RoadmapItem>
+              </Grid>
+            ))}
+          </Grid>
+        )}
       </RoadmapContainer>
     </RoadmapSection>
   );
