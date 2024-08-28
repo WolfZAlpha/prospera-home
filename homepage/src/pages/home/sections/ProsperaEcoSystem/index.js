@@ -249,21 +249,21 @@ function ProsperaEcoSystem() {
                 <FeatureBox
                   title="Democratized Hedge Fund Access"
                   description="Empowering everyone, from seasoned investors to newcomers. PROSPERA breaks down barriers to sophisticated investment opportunities."
-                  color="#00ffff"
+                  color="#01ff02"
                 />
               </Grid>
               <Grid item xs={12}>
                 <FeatureBox
                   title="Quarterly Revenue Sharing"
                   description="Become a true stakeholder. Participate in our Quarterly RevShare program and earn a portion of the platform's revenue."
-                  color="#00ff00"
+                  color="#01ff02"
                 />
               </Grid>
               <Grid item xs={12}>
                 <FeatureBox
                   title="AI-Driven Investment Strategies"
                   description="Powered by OmniMind_Nexus, our cutting-edge AI with a 99.3% win rate in market predictions."
-                  color="#ff00ff"
+                  color="#01ff02"
                 />
               </Grid>
             </>
@@ -273,7 +273,7 @@ function ProsperaEcoSystem() {
                 <FeatureBox
                   title="Democratized Hedge Fund Access"
                   description="Empowering everyone, from seasoned investors to newcomers. PROSPERA breaks down barriers to sophisticated investment opportunities."
-                  color="#00ffff"
+                  color="#01ff02"
                 />
               </Grid>
               <Grid item xs={12} md={4} />
@@ -281,7 +281,7 @@ function ProsperaEcoSystem() {
                 <FeatureBox
                   title="AI-Driven Investment Strategies"
                   description="Powered by OmniMind_Nexus, our cutting-edge AI with a 99.3% win rate in market predictions."
-                  color="#ff00ff"
+                  color="#01ff02"
                 />
               </Grid>
               <Grid item xs={12}>
@@ -297,7 +297,7 @@ function ProsperaEcoSystem() {
                   <FeatureBox
                     title="Quarterly Revenue Sharing"
                     description="Become a true stakeholder. Participate in our Quarterly RevShare program and earn a portion of the platform's revenue."
-                    color="#00ff00"
+                    color="#01ff02"
                   />
                 </Box>
               </Grid>
