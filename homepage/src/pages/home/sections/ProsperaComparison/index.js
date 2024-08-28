@@ -528,7 +528,7 @@ const ProsperaStaking = () => {
                 },
               }}
             >
-              Start Staking Now
+              Join Whitelist Now
             </MKButton>
           </MKBox>
         </Grid>
