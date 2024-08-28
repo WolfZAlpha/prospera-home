@@ -79,7 +79,7 @@ const StageTitle = styled(Typography)(({ theme }) => ({
   fontSize: theme.typography.pxToRem(14),
   fontWeight: 700,
   marginBottom: theme.spacing(2),
-  color: "#00FFFF",
+  color: "#01ff02",
   textShadow: "0 0 10px rgba(0, 255, 255, 0.5)",
 }));
 
@@ -96,7 +96,7 @@ const StageList = styled("ul")(({ theme }) => ({
     color: "#ffffff",
     "&::before": {
       content: '"▹"',
-      color: "#00FFFF",
+      color: "#01ff02",
       position: "absolute",
       left: 0,
       top: "50%",
@@ -126,7 +126,7 @@ const WireframeLandscape = () => {
       const amplitude = 100;
       const frequency = 0.01;
 
-      ctx.strokeStyle = "#00FFFF";
+      ctx.strokeStyle = "#01ff02";
       ctx.lineWidth = 1;
 
       for (let x = 0; x < canvas.width + gridSize; x += gridSize) {
@@ -202,7 +202,7 @@ const Roadmap = () => {
         "Security Audit",
         "ERC-20 Token on Arbitrum",
       ],
-      color: "#00FFFF",
+      color: "#01ff02",
     },
     {
       stage: "Stage 2",
@@ -214,7 +214,7 @@ const Roadmap = () => {
         "Smart Contract Upgrade",
         "Staking Contract Implementation",
       ],
-      color: "#00FFFF",
+      color: "#01ff02",
     },
     {
       stage: "Stage 3",
@@ -226,7 +226,7 @@ const Roadmap = () => {
         "Ecosystem Expansion",
         "PROSPERA Mobile App",
       ],
-      color: "#00FFFF",
+      color: "#01ff02",
     },
     {
       stage: "Stage 4",
@@ -238,7 +238,7 @@ const Roadmap = () => {
         "Hard-Money Crypto-Lending Beta-Test",
         "Legal Expansion",
       ],
-      color: "#00FFFF",
+      color: "#01ff02",
     },
     {
       stage: "Stage 5",
@@ -250,7 +250,7 @@ const Roadmap = () => {
         "Achievement Sustainable Ecosystem",
         "Third Q-Div RevShare Dispersement to Stakers",
       ],
-      color: "#00FFFF",
+      color: "#01ff02",
     },
     {
       stage: "Stage 6",
@@ -262,7 +262,7 @@ const Roadmap = () => {
         "All Omnichain Expansion ICO's complete",
         "Fourth Q-Div RevShare Dispersement to Stakers",
       ],
-      color: "#00FFFF",
+      color: "#01ff02",
     },
   ];
 
@@ -283,7 +283,7 @@ const Roadmap = () => {
           gutterBottom
           sx={{
             fontFamily: "Roboto, sans-serif",
-            color: "#00FFFF",
+            color: "#01ff02",
             fontSize: { xs: "2.5rem", md: "3.5rem" },
             marginBottom: 4,
             textShadow: "0 0 20px rgba(0, 255, 255, 0.5)",

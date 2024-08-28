@@ -40,7 +40,7 @@ const WireframeLandscape = () => {
       const amplitude = 100;
       const frequency = 0.01;
 
-      ctx.strokeStyle = "#00FFFF";
+      ctx.strokeStyle = "#01ff02";
       ctx.lineWidth = 1;
 
       for (let x = 0; x < canvas.width + gridSize; x += gridSize) {
