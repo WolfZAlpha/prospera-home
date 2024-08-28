@@ -30,7 +30,7 @@ import MKButton from "components/MKButton";
 import IllustrationLayout from "pages/Authentication/components/IllustrationLayout";
 
 // Image
-import bgImage from "assets/images/illustrations/illustration-reset.jpg";
+import bgImage from "assets/images/backgrounds/DesktopBackgrounds/EvilFaces/EvilFace1.png";
 
 function Illustration() {
   const [rememberMe, setRememberMe] = useState(false);
