@@ -508,19 +508,23 @@ const ProsperaStaking = () => {
           </Grid>
           <MKBox mt={4} textAlign="center">
             <MKButton
-              variant="gradient"
-              color="info"
-              size="large"
-              component="a"
-              href="https://www.prosperaico.com/staking"
+              variant="joinico"
+              href="https://www.prosperaico.com"
               target="_blank"
               rel="noopener noreferrer"
               sx={{
-                borderRadius: borders.borderRadius.lg,
-                boxShadow: boxShadows.lg,
+                mt: 2,
+                backgroundColor: "black",
+                color: colors.pros.main,
+                border: `1px solid ${colors.pros.main}`,
+                boxShadow: `0 0 15px ${colors.pros.main}`,
                 "&:hover": {
-                  transform: "translateY(-3px)",
-                  boxShadow: boxShadows.xl,
+                  backgroundColor: "black",
+                  animation: "float 0.3s ease-in-out infinite alternate",
+                },
+                "@keyframes float": {
+                  "0%": { transform: "translateY(0px)" },
+                  "100%": { transform: "translateY(-5px)" },
                 },
               }}
             >
