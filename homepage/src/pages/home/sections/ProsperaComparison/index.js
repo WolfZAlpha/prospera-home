@@ -473,10 +473,10 @@ const ProsperaStaking = () => {
                 icon={
                   <i
                     className="fas fa-lock-open"
-                    style={{ fontSize: "1.5rem", color: colors.success.main }}
+                    style={{ fontSize: "1.5rem", color: colors.pros.main }}
                   />
                 }
-                color={colors.success.main}
+                color={colors.pros.main}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -486,10 +486,10 @@ const ProsperaStaking = () => {
                 icon={
                   <i
                     className="fas fa-money-bill-wave"
-                    style={{ fontSize: "1.5rem", color: colors.warning.main }}
+                    style={{ fontSize: "1.5rem", color: colors.pros.main }}
                   />
                 }
-                color={colors.warning.main}
+                color={colors.pros.main}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -499,10 +499,10 @@ const ProsperaStaking = () => {
                 icon={
                   <i
                     className="fas fa-balance-scale"
-                    style={{ fontSize: "1.5rem", color: colors.error.main }}
+                    style={{ fontSize: "1.5rem", color: colors.pros.main }}
                   />
                 }
-                color={colors.error.main}
+                color={colors.pros.main}
               />
             </Grid>
           </Grid>
