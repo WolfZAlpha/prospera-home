@@ -307,6 +307,7 @@ const ProsperaStaking = () => {
         "& #redblocks > *": {
           transform: "translate3d(160px, -93px, 0)",
           animation: "moveblocks 4s 1s ease infinite",
+          fill: "#01ff02",
         },
         "@keyframes moveblocks": {
           "0%": {
@@ -319,6 +320,7 @@ const ProsperaStaking = () => {
         "& #firstBlock": {
           transform: "translate3d(160px, -93px, 0)",
           animation: "firstBlock 4s 1s ease infinite",
+          fill: "#01ff02",
         },
         "& #blockdis": {
           animation: "blockdis 4s 1s ease infinite",
@@ -340,11 +342,11 @@ const ProsperaStaking = () => {
             opacity: 1,
           },
         },
-        "& #redblocksparticles g:nth-child(1) polygon, & #redblocksparticles g:nth-child(2) polygon, & #redblocksparticles g:nth-child(3) polygon, & #redblocksparticles g:nth-child(4) polygon":
-          {
-            opacity: 0.35,
-            animation: "glow 4s 1s ease infinite",
-          },
+        "& #redblocksparticles g:nth-child(n) polygon": {
+          opacity: 0.35,
+          animation: "glow 4s 1s ease infinite",
+          fill: "#01ff02",
+        },
         "@keyframes glow": {
           "0%, 45%": {
             opacity: 0,
@@ -428,6 +430,18 @@ const ProsperaStaking = () => {
         },
         "& #Layer_1 > g:nth-child(2) > g:nth-child(17) > g:nth-child(12)": {
           animation: "arrows 1s ease-in-out infinite alternate, p 2s ease infinite alternate",
+        },
+        html: {
+          background: "rgba(12, 0, 25, 0)",
+        },
+        "& #redblocks polygon, & #redblocksparticles polygon": {
+          fill: "#01ff02",
+        },
+        "& #redglowparticles polygon": {
+          fill: "#01ff02",
+        },
+        "& #bottomparticles polygon, & #bottomparticles2 polygon": {
+          fill: "#01ff02",
         },
       }}
     >

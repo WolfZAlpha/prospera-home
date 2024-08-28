@@ -305,7 +305,6 @@ const Roadmap = () => {
             color: "#01ff02",
             fontSize: { xs: "2.5rem", md: "3.5rem" },
             marginBottom: 4,
-            textShadow: "0 0 20px rgba(0, 255, 255, 0.5)",
           }}
         >
           Roadmap to the Future

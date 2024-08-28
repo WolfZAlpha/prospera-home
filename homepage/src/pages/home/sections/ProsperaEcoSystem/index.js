@@ -143,7 +143,7 @@ const OrbitingParticles = () => {
 
 const ProsperaText = () => (
   <Box sx={{ textAlign: "center" }}>
-    <MKTypography variant="h4" textGradient color="pros" fontWeight="bold">
+    <MKTypography variant="h1" color="pros" fontWeight="bold">
       PROSPERA
     </MKTypography>
     <MKTypography variant="body2" color="white">
@@ -171,21 +171,21 @@ function ProsperaEcoSystem() {
         <Grid container spacing={4} alignItems="flex-start">
           <Grid item xs={12} md={6}>
             <Box sx={{ pl: 2, borderLeft: "4px solid #00ff00" }}>
-              <MKTypography variant="h6" color="pros" fontWeight="bold">
+              <MKTypography variant="h4" color="pros" fontWeight="bold">
                 PROSPERA Ecosystem
               </MKTypography>
             </Box>
             <MKTypography variant="h4" fontWeight="bold" color="white" mt={2}>
               Unlock the Future of Finance with PROSPERA
             </MKTypography>
-            <MKTypography variant="body2" fontWeight="600" color="white" mt={2}>
+            <MKTypography variant="body1" fontWeight="400" color="white" mt={2}>
               Access elite hedge fund strategies, harness the power of AI-driven investments, and
               earn quarterly revenue shares, all within a deflationary tokenomics model designed for
               long-term value.
             </MKTypography>
           </Grid>
           <Grid item xs={12} md={6} sx={{ textAlign: isMobile ? "left" : "right" }}>
-            <MKTypography variant="body2" fontWeight="600" color="white">
+            <MKTypography variant="body1" fontWeight="400" color="white">
               The <span style={{ color: colors.pros.main }}>PROSPERA</span> Ecosystem is engineered
               to revolutionize DeFi, offering unparalleled AI-driven strategies, democratized access
               to elite financial tools, and a unique deflationary model. Don&apos;t miss out on the
