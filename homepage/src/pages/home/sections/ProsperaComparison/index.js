@@ -440,7 +440,7 @@ const ProsperaStaking = () => {
               textGradient
               fontWeight="bold"
               sx={{
-                backgroundImage: `linear-gradient(to right, ${colors.info.main}, ${colors.success.main})`,
+                backgroundImage: `linear-gradient(to right, ${colors.pros.main}, ${colors.pros.main})`,
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
@@ -460,10 +460,10 @@ const ProsperaStaking = () => {
                 icon={
                   <i
                     className="fas fa-chart-line"
-                    style={{ fontSize: "1.5rem", color: colors.info.main }}
+                    style={{ fontSize: "1.5rem", color: colors.pros.main }}
                   />
                 }
-                color={colors.info.main}
+                color={colors.pros.main}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
