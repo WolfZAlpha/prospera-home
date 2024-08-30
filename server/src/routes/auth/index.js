@@ -4,13 +4,15 @@ import {
   loginRouteHandler,
   registerRouteHandler,
   resetPasswordRouteHandler,
+  checkAuthRouteHandler,
 } from "../../services/auth/index.js";
+import { verifyAuth } from "../../services/auth/index.js";
 
 const router = express.Router();
 
 router.post("/login", async (req, res, next) => {
-  const { email, password } = req.body.data.attributes;
-  await loginRouteHandler(req, res, email, password);
+  console.log("Login route hit. Request body:", req.body);
+  await loginRouteHandler(req, res);
 });
 
 router.post("/logout", (req, res) => {
@@ -18,17 +20,35 @@ router.post("/logout", (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-  const { name, email, password } = req.body.data.attributes;
-  await registerRouteHandler(req, res, name, email, password);
+  await registerRouteHandler(req, res);
 });
 
 router.post("/password-forgot", async (req, res) => {
-  const { email } = req.body.data.attributes;
-  await forgotPasswordRouteHandler(req, res, email);
+  await forgotPasswordRouteHandler(req, res);
 });
 
 router.post("/password-reset", async (req, res) => {
   await resetPasswordRouteHandler(req, res);
+});
+
+// Add this new route
+router.get("/check", verifyAuth, async (req, res) => {
+  try {
+    const user = req.user;
+    const fullAccessRoles = ["admin", "co-admin", "prosperaTeam", "kol"];
+    const hasFullAccess =
+      fullAccessRoles.includes(user.role) || user.isWhitelisted;
+
+    res.json({
+      user: {
+        ...user,
+        hasFullAccess,
+      },
+    });
+  } catch (error) {
+    console.error("Error in checkAuthRouteHandler:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 export default router;

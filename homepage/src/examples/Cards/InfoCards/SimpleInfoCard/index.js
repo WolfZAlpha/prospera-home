@@ -66,7 +66,7 @@ function SimpleInfoCard({ color, icon, title, description, direction }) {
 
 // Setting default props for the SimpleInfoCard
 SimpleInfoCard.defaultProps = {
-  color: "info",
+  color: "pros",
   direction: "left",
 };
 
@@ -75,6 +75,8 @@ SimpleInfoCard.propTypes = {
   color: PropTypes.oneOf([
     "primary",
     "secondary",
+    "black",
+    "pros",
     "info",
     "success",
     "warning",

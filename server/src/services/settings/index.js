@@ -11,12 +11,12 @@ export const getSettings = async (userId) => {
 
 export const updateSettings = async (userId, newSettings) => {
   try {
-    const { virtualReality, dashboard, portfolio } = newSettings;
+    const { AugmentedReality, dashboard, portfolio } = newSettings;
     const user = await userModel.findByIdAndUpdate(
       userId,
       {
         $set: {
-          "customSettings.virtualReality": virtualReality,
+          "customSettings.AugmentedReality": AugmentedReality,
           "customSettings.dashboard": dashboard,
           "customSettings.portfolio": portfolio,
         },

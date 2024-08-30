@@ -32,7 +32,7 @@ import MKButton from "components/MKButton";
 
 // PROSPERA DEFI PLATFORM React examples
 import DefaultNavbar from "examples/Navbars/DefaultNavbar";
-import DefaultFooter from "examples/Footers/DefaultFooter";
+import Footer from "./Footer";
 
 // About Us page sections
 import Information from "pages/Company/AboutUs/sections/Information";
@@ -162,7 +162,7 @@ function AboutUs() {
         <Newsletter />
       </Card>
       <MKBox pt={6} px={1} mt={6}>
-        <DefaultFooter content={footerRoutes} />
+        <Footer content={footerRoutes} />
       </MKBox>
     </>
   );

@@ -80,21 +80,37 @@ export async function verifyToken(token) {
 }
 
 export const loginRouteHandler = async (req, res) => {
-  const { email, password } = req.body;
+  console.log("Login handler. Request body:", req.body);
+  const { emailOrUsername, password } = req.body.data.attributes;
 
-  let foundUser = await userModel.findOne({ email: email });
+  console.log("Attempting to find user with:", { emailOrUsername });
+
+  let foundUser = await userModel.findOne({
+    $or: [{ email: emailOrUsername }, { username: emailOrUsername }],
+  });
+
   if (!foundUser) {
+    console.log("User not found");
     return res.status(400).json({
       errors: [{ detail: "Invalid credentials" }],
     });
   }
 
-  const validPassword = await bcrypt.compare(password, foundUser.password);
+  console.log("User found, checking password");
+  console.log("Stored hashed password:", foundUser.password);
+  console.log("Provided password:", password);
+
+  const validPassword = await foundUser.matchPassword(password);
+  console.log("Password valid:", validPassword);
+
   if (!validPassword) {
+    console.log("Invalid password");
     return res.status(400).json({
       errors: [{ detail: "Invalid credentials" }],
     });
   }
+
+  console.log("Password valid, generating token");
 
   const token = await generateToken({
     id: foundUser.id,
@@ -116,7 +132,9 @@ export const loginRouteHandler = async (req, res) => {
       id: foundUser.id,
       name: foundUser.name,
       email: foundUser.email,
+      username: foundUser.username,
       role: foundUser.role,
+      arbitrumWallet: foundUser.arbitrumWallet,
     },
   });
 };
@@ -133,11 +151,18 @@ export const logoutRouteHandler = (req, res) => {
 };
 
 export const registerRouteHandler = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, arbitrumWallet } = req.body.data.attributes;
 
   let foundUser = await userModel.findOne({ email: email });
   if (foundUser) {
     return res.status(400).json({ message: "The email is already in use" });
+  }
+
+  foundUser = await userModel.findOne({ arbitrumWallet: arbitrumWallet });
+  if (foundUser) {
+    return res
+      .status(400)
+      .json({ message: "The Arbitrum wallet is already in use" });
   }
 
   if (!password || password.length < 8) {
@@ -155,6 +180,7 @@ export const registerRouteHandler = async (req, res) => {
     name: name,
     email: email,
     password: hashPassword,
+    arbitrumWallet: arbitrumWallet,
     role: userRole._id,
   });
   await newUser.save();
@@ -180,7 +206,9 @@ export const registerRouteHandler = async (req, res) => {
       name: newUser.name,
       email: newUser.email,
       role: newUser.role,
+      arbitrumWallet: newUser.arbitrumWallet,
     },
+    token: token,
   });
 };
 
@@ -256,17 +284,42 @@ export const resetPasswordRouteHandler = async (req, res) => {
 };
 
 export const verifyAuth = async (req, res, next) => {
-  const token = req.cookies.token;
+  const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
 
   if (!token) {
     return res.status(401).json({ message: "Authentication required" });
   }
 
-  const payload = await verifyToken(token);
-  if (!payload) {
-    return res.status(401).json({ message: "Invalid or expired token" });
-  }
+  try {
+    const payload = await verifyToken(token);
+    if (!payload) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
 
-  req.user = payload;
-  next();
+    req.user = payload;
+    next();
+  } catch (error) {
+    console.error("Error verifying auth:", error);
+    res.status(401).json({ message: "Authentication failed" });
+  }
+};
+
+export const checkAuthRouteHandler = async (req, res) => {
+  try {
+    // At this point, the user is already authenticated due to the verifyAuth middleware
+    const user = req.user;
+    const fullAccessRoles = ["admin", "co-admin", "prosperaTeam", "kol"];
+    const hasFullAccess =
+      fullAccessRoles.includes(user.role) || user.isWhitelisted;
+
+    res.json({
+      user: {
+        ...user,
+        hasFullAccess,
+      },
+    });
+  } catch (error) {
+    console.error("Error in checkAuthRouteHandler:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };

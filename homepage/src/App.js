@@ -13,25 +13,20 @@
 */
 
 import { useEffect } from "react";
-
-// react-router components
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-
-// @mui material components
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-
-// PROSPERA DEFI PLATFORM React themes
 import theme from "assets/theme";
 import Home from "layouts/pages/home";
-
-// PROSPERA DEFI PLATFORM React routes
 import routes from "routes";
+import AugmentedReality from "pages/AugmentedReality";
+import { AuthProvider } from "contexts/AuthContext";
+import { WalletProvider } from "contexts/WalletContext";
+import { BetaProvider } from "contexts/BetaContext";
 
 export default function App() {
   const { pathname } = useLocation();
 
-  // Setting page scroll to 0 when changing the route
   useEffect(() => {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
@@ -51,13 +46,20 @@ export default function App() {
     });
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Routes>
-        {getRoutes(routes)}
-        <Route path="/home" element={<Home />} />
-        <Route path="*" element={<Navigate to="/home" />} />
-      </Routes>
-    </ThemeProvider>
+    <AuthProvider>
+      <WalletProvider>
+        <BetaProvider>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Routes>
+              {getRoutes(routes)}
+              <Route path="/home" element={<Home />} />
+              <Route path="/pages/augmented-reality" element={<AugmentedReality />} />
+              <Route path="*" element={<Navigate to="/home" />} />
+            </Routes>
+          </ThemeProvider>
+        </BetaProvider>
+      </WalletProvider>
+    </AuthProvider>
   );
 }

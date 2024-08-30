@@ -67,10 +67,11 @@ export default {
     },
   ],
   copyright: (
-    <MKTypography variant="button" fontWeight="regular">
+    <MKTypography color="white" variant="button" fontWeight="regular">
       All rights reserved. Copyright &copy; {date} PROSPERA by{" "}
       <MKTypography
         component="a"
+        color="pros"
         href="https://www.prosperadefi.com"
         target="_blank"
         rel="noreferrer"

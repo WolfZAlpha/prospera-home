@@ -40,10 +40,11 @@ function ContactUs() {
           routes={routes}
           action={{
             type: "external",
-            route: "https://www.creative-tim.com/product/material-kit-pro-react",
-            label: "buy now",
-            color: "info",
+            route: "https://www.prosperaico.com",
+            label: "join ico",
+            color: "pros",
           }}
+          sticky
         />
       </MKBox>
       <Grid container spacing={3} alignItems="center">

@@ -13,30 +13,58 @@ import ReseedAction from "./mongoose/RessedAction.js";
 import { initializeChat } from "./services/chat/index.js";
 import cookieParser from "cookie-parser";
 
-dotenv.config();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PORT = process.env.PORT || 8080;
+// Load environment variables from the root .env file
+dotenv.config({ path: path.join(__dirname, "..", "..", ".env") });
+
+const config = {
+  port: process.env.PORT || 8080,
+  isDev: process.env.NODE_ENV === "development",
+  dbLink: process.env.DB_LINK,
+  jwtSecret: process.env.JWT_SECRET,
+  clientUrl:
+    process.env.NODE_ENV === "development"
+      ? process.env.APP_URL_CLIENT_DEV
+      : process.env.APP_URL_CLIENT_PROD,
+  dashboardUrl:
+    process.env.NODE_ENV === "development"
+      ? process.env.APP_URL_DASHBOARD_DEV
+      : process.env.APP_URL_DASHBOARD_PROD,
+  vrUrl:
+    process.env.NODE_ENV === "development"
+      ? process.env.APP_URL_VR_DEV
+      : process.env.APP_URL_VR_PROD,
+  apiUrl:
+    process.env.NODE_ENV === "development"
+      ? process.env.APP_URL_API_DEV
+      : process.env.APP_URL_API_PROD,
+};
+
 const app = express();
 const server = http.createServer(app);
 
 const whitelist = [
-  process.env.APP_URL_CLIENT,
-  process.env.APP_URL_DASHBOARD,
-  process.env.APP_URL_VR,
-  process.env.APP_URL_API,
+  config.clientUrl,
+  config.dashboardUrl,
+  config.vrUrl,
+  config.apiUrl,
+  "http://localhost:3000", // For local development
 ];
+
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin || whitelist.indexOf(origin) !== -1) {
+    if (!origin || whitelist.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  exposedHeaders: ["set-cookie"],
 };
 
 const startServer = async () => {
@@ -48,27 +76,27 @@ const startServer = async () => {
       bodyParser.json({ type: "application/vnd.api+json", strict: false })
     );
     app.use(express.json());
+    app.use(express.urlencoded({ extended: true }));
     app.use(cookieParser());
     app.use(passport.initialize());
 
-    // API routes
+    app.get("/health", (req, res) => {
+      res.status(200).json({ status: "OK", message: "Server is running" });
+    });
+
     app.use("/api", routes);
 
-    // Serve static files for the homepage
     app.use(express.static(path.join(__dirname, "../../homepage/build")));
 
-    // Handle any requests that don't match the above for the homepage
     app.get("*", (req, res) => {
-      // Check if the request is coming from the main domain or its subdomains
       const hostname = req.hostname;
       const isMainDomain =
-        hostname === process.env.FRONTEND_URL ||
-        hostname.endsWith("." + process.env.FRONTEND_URL);
+        hostname === config.clientUrl ||
+        hostname.endsWith("." + config.clientUrl);
 
       if (isMainDomain) {
         res.sendFile(path.join(__dirname, "../../homepage/build/index.html"));
       } else {
-        // For any other domain (including dashboard), send a JSON response
         res.status(404).json({ message: "Not found" });
       }
     });
@@ -79,16 +107,24 @@ const startServer = async () => {
       });
     }
 
-    // Initialize chat
     initializeChat(server);
 
-    // Error handling middleware
     app.use((err, req, res, next) => {
-      console.error(err.stack);
-      res.status(500).json({ message: "Internal Server Error" });
+      console.error("Error:", err);
+      res.status(err.status || 500).json({
+        message: err.message || "Internal Server Error",
+        stack: config.isDev ? err.stack : "🥞",
+      });
     });
 
-    server.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+    server.listen(config.port, () => {
+      console.log(`Server listening on port ${config.port}`);
+      console.log("Environment:", process.env.NODE_ENV);
+      console.log("DB_LINK:", config.dbLink ? "Set" : "Not set");
+      console.log("APP_URL_CLIENT:", config.clientUrl);
+      console.log("CORS Whitelist:", whitelist);
+      console.log("API Base URL:", `${config.apiUrl}/api`);
+    });
   } catch (error) {
     console.error("Failed to start the server:", error);
     process.exit(1);

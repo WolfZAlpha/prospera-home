@@ -129,8 +129,8 @@ function Presentation() {
         action={{
           type: "external",
           route: "https://www.prosperaico.com",
-          label: "buy now",
-          color: "dark",
+          label: "join ico",
+          color: "pros",
         }}
         sticky
       />
@@ -220,6 +220,7 @@ function Presentation() {
               height: 50,
               borderRadius: "50%",
               backgroundColor: "black",
+              color: "pros",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
@@ -244,7 +245,7 @@ function Presentation() {
 
           {/* Bridge to Arbitrum button */}
           <MKButton
-            variant="contained"
+            variant="joinico"
             color="black"
             component="a"
             href="https://bridge.arbitrum.io/"

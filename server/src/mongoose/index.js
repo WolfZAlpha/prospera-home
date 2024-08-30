@@ -5,9 +5,11 @@ dotenv.config();
 
 export const dbConnect = async () => {
   try {
+    if (!process.env.DB_LINK) {
+      throw new Error("DB_LINK is not defined in the environment variables");
+    }
+
     await mongoose.connect(process.env.DB_LINK, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       ssl: true,
       tlsAllowInvalidCertificates: true, // Only use this for testing. Remove in production.
     });

@@ -3,17 +3,18 @@ import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
+  username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: {
     type: String,
-    enum: ["admin", "prosperaTeam", "kol", "user"],
+    enum: ["admin", "co-admin", "prosperaTeam", "kol", "user"],
     default: "user",
   },
-  walletAddress: { type: String, required: true, unique: true },
+  arbitrumWallet: { type: String, required: true, unique: true },
   profileImage: { type: String },
   customSettings: {
-    virtualReality: {
+    AugmentedReality: {
       calendar: { type: Object },
       todoList: [{ type: String }],
       emailIntegration: { type: Object },
@@ -35,7 +36,12 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.matchPassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+  console.log("Comparing passwords:");
+  console.log("Entered password:", enteredPassword);
+  console.log("Stored hashed password:", this.password);
+  const isMatch = await bcrypt.compare(enteredPassword, this.password);
+  console.log("Password match result:", isMatch);
+  return isMatch;
 };
 
 export const userModel = mongoose.model("User", userSchema);

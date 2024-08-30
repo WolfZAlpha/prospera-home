@@ -52,6 +52,8 @@ MKBox.propTypes = {
   coloredShadow: PropTypes.oneOf([
     "primary",
     "secondary",
+    "pros",
+    "black",
     "info",
     "success",
     "warning",

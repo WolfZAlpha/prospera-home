@@ -164,80 +164,100 @@ export const getUserRoute = async (req, res) => {
     }
   }
 
-  const user = await userModel
-    .findById(userId)
-    .populate("role")
-    .select(fieldsUser);
-  const role = await roleModel
-    .findOne({ _id: user.role })
-    .populate("permissions")
-    .select(fieldsRole);
-  let userPermissions = await permissionModel
-    .find({ _id: { $in: role["permissions"] } })
-    .select(fieldsPerms);
+  try {
+    const user = await userModel
+      .findById(userId)
+      .populate("role")
+      .select(fieldsUser);
 
-  if (fieldsRole) {
-    fieldObj = {
-      links: {
-        self: `${process.env.APP_URL_API}/${role.id}/relationships/roles`,
-        related: `${process.env.APP_URL_API}/${role.id}/roles`,
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const role = await roleModel
+      .findOne({ _id: user.role })
+      .populate("permissions")
+      .select(fieldsRole);
+
+    let userPermissions = await permissionModel
+      .find({ _id: { $in: role.permissions } })
+      .select(fieldsPerms);
+
+    const hasFullAccess =
+      ["admin", "co-admin", "prosperaTeam", "kol"].includes(role.name) ||
+      user.isWhitelisted;
+
+    if (fieldsRole) {
+      fieldObj = {
+        links: {
+          self: `${process.env.APP_URL_API}/${role.id}/relationships/roles`,
+          related: `${process.env.APP_URL_API}/${role.id}/roles`,
+        },
+      };
+    }
+
+    let sentData = {
+      type: "users",
+      id: userId,
+      attributes: {
+        ...user._doc,
+        roleName: role.name,
+        isWhitelisted: user.isWhitelisted,
+        hasFullAccess: hasFullAccess,
       },
     };
-  }
+    delete sentData.attributes.password;
 
-  let sentData = {
-    type: "users",
-    id: userId,
-    attributes: {
-      ...user._doc,
-    },
-  };
-  delete sentData.attributes.password;
-
-  if (options.length > 0) {
-    if (options.find((el) => el == "roles")) {
-      sentData = {
-        ...sentData,
-        relationships: {
-          roles: {
-            data: [
-              {
-                type: "roles",
-                id: role.id,
-              },
-            ],
-          },
-        },
-      };
-      includedDataRoles = {
-        type: "roles",
-        id: role.id,
-        attributes: {
-          ...role._doc,
-        },
-      };
-    }
-    if (options.find((el) => el == "roles.permissions")) {
-      let jsonArray = {};
-      includedDataPermissions = userPermissions.map((element) => {
-        let jsonObj = {
-          type: "permissions",
-          id: element.id,
-          attributes: {
-            name: element.name,
-            ...element._doc,
+    if (options.length > 0) {
+      if (options.includes("roles")) {
+        sentData = {
+          ...sentData,
+          relationships: {
+            roles: {
+              data: [
+                {
+                  type: "roles",
+                  id: role.id,
+                },
+              ],
+            },
           },
         };
-        return (jsonArray = { ...jsonArray, ...jsonObj });
-      });
+        includedDataRoles = {
+          type: "roles",
+          id: role.id,
+          attributes: {
+            ...role._doc,
+          },
+        };
+      }
+      if (options.includes("roles.permissions")) {
+        let jsonArray = {};
+        includedDataPermissions = userPermissions.map((element) => {
+          let jsonObj = {
+            type: "permissions",
+            id: element.id,
+            attributes: {
+              name: element.name,
+              ...element._doc,
+            },
+          };
+          return (jsonArray = { ...jsonArray, ...jsonObj });
+        });
+      }
     }
+
+    const finalData = {
+      data: { ...sentData },
+      relationships: { ...fieldObj },
+      included: [{ ...includedDataRoles }, ...includedDataPermissions],
+    };
+
+    return res.status(200).send(finalData);
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
-  const finalData = {
-    data: { ...sentData },
-    relationships: { ...fieldObj },
-    included: [{ ...includedDataRoles }, ...includedDataPermissions],
-  };
-  return res.status(200).send(finalData);
 };
 
 export const createUserRoute = async (req, res) => {

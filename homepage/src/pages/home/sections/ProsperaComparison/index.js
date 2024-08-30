@@ -1,17 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import PropTypes from "prop-types";
-import { Box, Container, Grid, Card, CardContent, Button, useMediaQuery } from "@mui/material";
+import { Box, Container, Grid, useMediaQuery } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  LabelList,
-  CartesianGrid,
-} from "recharts";
 import * as THREE from "three";
 import MKBox from "components/MKBox";
 import MKTypography from "components/MKTypography";
@@ -20,87 +10,20 @@ import colors from "assets/theme/base/colors";
 import borders from "assets/theme/base/borders";
 import boxShadows from "assets/theme/base/boxShadows";
 import { ReactComponent as BlockchainAnimation } from "./blockchainanimation.svg";
+import Table from "./Table";
+import alphaFinanceLogo from "./companyImages/alpha-logo-vertical.svg";
+import barnBridgeLogo from "./companyImages/barnbridge.png";
+import prosperaLogo from "./companyImages/prospera.png";
+import rariCapitalLogo from "./companyImages/rariCapital.jpeg";
+import yearnFinanceLogo from "./companyImages/yfi.png";
 
 const ProsperaComparisonSection = styled(MKBox)({
   position: "relative",
   padding: "120px 0",
-  color: "#ffffff",
+  color: "#000000",
   overflow: "hidden",
   background: "black",
 });
-
-const TitleBackdrop = styled(Box)({
-  borderBottom: "2px solid rgba(255, 255, 255, 0.1)",
-  marginBottom: "40px",
-  paddingBottom: "20px",
-});
-
-const ComparisonCard = styled(Card)({
-  background: "rgba(10, 10, 10, 0.8)",
-  backdropFilter: "blur(20px)",
-  borderRadius: "12px",
-  border: "1px solid rgba(255, 255, 255, 0.1)",
-  boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-});
-
-const CompanyButton = styled(Button)(({ active }) => ({
-  color: active ? "#ffffff" : "#0088FE",
-  background: active ? "#0088FE" : "transparent",
-  border: `1px solid ${active ? "#0088FE" : "rgba(255, 255, 255, 0.3)"}`,
-  borderRadius: "20px",
-  padding: "5px 15px",
-  margin: "0 5px",
-  fontSize: "0.8rem",
-  transition: "all 0.3s ease",
-  "&:hover": {
-    background: active ? "#0088FE" : "rgba(255, 255, 255, 0.1)",
-  },
-}));
-
-const data = {
-  "AI-Driven Strategies": {
-    Prospera: 90,
-    "Yearn Finance": 70,
-    "Rari Capital": 70,
-    BarnBridge: 60,
-    "Alpha Finance": 60,
-  },
-  "Security Features": {
-    Prospera: 100,
-    "Yearn Finance": 80,
-    "Rari Capital": 70,
-    BarnBridge: 80,
-    "Alpha Finance": 70,
-  },
-  "Staking Options": {
-    Prospera: 80,
-    "Yearn Finance": 90,
-    "Rari Capital": 80,
-    BarnBridge: 70,
-    "Alpha Finance": 80,
-  },
-  "Deflationary Tokenomics": {
-    Prospera: 90,
-    "Yearn Finance": 70,
-    "Rari Capital": 70,
-    BarnBridge: 60,
-    "Alpha Finance": 60,
-  },
-  "Community Engagement": {
-    Prospera: 80,
-    "Yearn Finance": 70,
-    "Rari Capital": 80,
-    BarnBridge: 70,
-    "Alpha Finance": 70,
-  },
-};
-
-const features = Object.keys(data);
-const competitors = ["Yearn Finance", "Rari Capital", "BarnBridge", "Alpha Finance"];
-const chartColors = {
-  Prospera: "#00ff00",
-  Competitor: "#0088FE",
-};
 
 const StarryBackground = () => {
   const mountRef = useRef(null);
@@ -170,83 +93,214 @@ const StarryBackground = () => {
 };
 
 const CompetitorComparison = () => {
-  const [selectedCompetitor, setSelectedCompetitor] = useState(competitors[0]);
+  const createDataRow = (company, tokenImageUrl, data) => ({
+    company: [tokenImageUrl, company],
+    ai_driven_strategies: (
+      <MKBox>
+        <MKTypography variant="h6" color="#01ff02">
+          {data.ai_driven_strategies.score}
+        </MKTypography>
+        <MKTypography variant="caption" color="white">
+          {data.ai_driven_strategies.description}
+        </MKTypography>
+      </MKBox>
+    ),
+    security_features: (
+      <MKBox>
+        <MKTypography variant="h6" color="#01ff02">
+          {data.security_features.score}
+        </MKTypography>
+        <MKTypography variant="caption" color="white">
+          {data.security_features.description}
+        </MKTypography>
+      </MKBox>
+    ),
+    staking_options: (
+      <MKBox>
+        <MKTypography variant="h6" color="#01ff02">
+          {data.staking_options.score}
+        </MKTypography>
+        <MKTypography variant="caption" color="white">
+          {data.staking_options.description}
+        </MKTypography>
+      </MKBox>
+    ),
+    deflationary_tokenomics: (
+      <MKBox>
+        <MKTypography variant="h6" color="#01ff02">
+          {data.deflationary_tokenomics.score}
+        </MKTypography>
+        <MKTypography variant="caption" color="white">
+          {data.deflationary_tokenomics.description}
+        </MKTypography>
+      </MKBox>
+    ),
+    community_engagement: (
+      <MKBox>
+        <MKTypography variant="h6" color="#01ff02">
+          {data.community_engagement.score}
+        </MKTypography>
+        <MKTypography variant="caption" color="white">
+          {data.community_engagement.description}
+        </MKTypography>
+      </MKBox>
+    ),
+  });
 
-  const chartData = features.map((feature) => ({
-    name: feature,
-    Prospera: data[feature].Prospera,
-    Competitor: data[feature][selectedCompetitor],
-  }));
+  const companyData = {
+    Prospera: {
+      tokenImageUrl: prosperaLogo,
+      ai_driven_strategies: {
+        score: 90,
+        description: "Advanced AI algorithms for predictive analytics.",
+      },
+      security_features: {
+        score: 100,
+        description: "Best-in-class security with multi-layer encryption.",
+      },
+      staking_options: {
+        score: 80,
+        description: "Competitive staking returns with flexible options.",
+      },
+      deflationary_tokenomics: {
+        score: 90,
+        description: "Strong deflationary mechanics reducing token supply.",
+      },
+      community_engagement: {
+        score: 80,
+        description: "Active community with regular updates and events.",
+      },
+    },
+    "Yearn Finance": {
+      tokenImageUrl: yearnFinanceLogo,
+      ai_driven_strategies: {
+        score: 70,
+        description: "Basic AI implementation with limited predictive power.",
+      },
+      security_features: {
+        score: 80,
+        description: "Strong security but occasional vulnerabilities.",
+      },
+      staking_options: { score: 90, description: "High staking rewards but higher risks." },
+      deflationary_tokenomics: {
+        score: 70,
+        description: "Moderate deflationary model, not aggressive.",
+      },
+      community_engagement: {
+        score: 70,
+        description: "Good engagement but less frequent updates.",
+      },
+    },
+    "Alpha Finance": {
+      tokenImageUrl: alphaFinanceLogo,
+      ai_driven_strategies: {
+        score: 60,
+        description: "Lacks sophisticated AI; mostly manual strategies.",
+      },
+      security_features: {
+        score: 70,
+        description: "Decent security, but lacks advanced protection.",
+      },
+      staking_options: { score: 80, description: "Balanced staking with average returns." },
+      deflationary_tokenomics: {
+        score: 60,
+        description: "Weak deflationary features, minimal impact.",
+      },
+      community_engagement: {
+        score: 70,
+        description: "Average community involvement, less active.",
+      },
+    },
+    "Rari Capital": {
+      tokenImageUrl: rariCapitalLogo,
+      ai_driven_strategies: { score: 70, description: "Moderate AI use but not fully optimized." },
+      security_features: {
+        score: 70,
+        description: "Standard security protocols without extra layers.",
+      },
+      staking_options: {
+        score: 80,
+        description: "Standard staking features with moderate returns.",
+      },
+      deflationary_tokenomics: {
+        score: 70,
+        description: "Standard model with some deflationary aspects.",
+      },
+      community_engagement: {
+        score: 80,
+        description: "Engaged community with decent interaction.",
+      },
+    },
+    BarnBridge: {
+      tokenImageUrl: barnBridgeLogo,
+      ai_driven_strategies: {
+        score: 60,
+        description: "Minimal AI, relying more on traditional methods.",
+      },
+      security_features: { score: 80, description: "Secure but not as robust as others." },
+      staking_options: { score: 70, description: "Limited staking options with lower returns." },
+      deflationary_tokenomics: {
+        score: 60,
+        description: "Minimal deflationary approach, focuses on other mechanisms.",
+      },
+      community_engagement: {
+        score: 70,
+        description: "Community is less active, fewer engagement opportunities.",
+      },
+    },
+  };
+
+  const rows = Object.entries(companyData).map(([company, data]) =>
+    createDataRow(company, data.tokenImageUrl, data)
+  );
+
+  const columns = [
+    { name: "company", align: "left" },
+    { name: "ai_driven_strategies", align: "center" },
+    { name: "security_features", align: "center" },
+    { name: "staking_options", align: "center" },
+    { name: "deflationary_tokenomics", align: "center" },
+    { name: "community_engagement", align: "center" },
+  ];
 
   return (
-    <Box>
-      <TitleBackdrop>
-        <MKTypography variant="h2" align="center" color="white" fontWeight="bold">
-          PROSPERA: Redefining the Future of Finance
-        </MKTypography>
-      </TitleBackdrop>
-
+    <Container>
       <Grid container spacing={4}>
         <Grid item xs={12}>
-          <ComparisonCard>
-            <CardContent>
-              <Box display="flex" justifyContent="center" alignItems="center" mb={4}>
-                <MKTypography variant="h5" color="white" fontWeight="bold">
-                  Performance Comparison
-                </MKTypography>
-              </Box>
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart
-                  data={chartData}
-                  layout="vertical"
-                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis type="number" domain={[0, 100]} stroke="#ffffff" />
-                  <YAxis dataKey="name" type="category" width={150} stroke="#ffffff" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "rgba(0, 0, 0, 0.8)",
-                      border: "1px solid rgba(255, 255, 255, 0.1)",
-                      borderRadius: "4px",
-                    }}
-                  />
-                  <Bar dataKey="Prospera" fill={chartColors.Prospera} name="PROSPERA">
-                    <LabelList dataKey="Prospera" position="right" fill="#ffffff" />
-                  </Bar>
-                  <Bar dataKey="Competitor" fill={chartColors.Competitor} name={selectedCompetitor}>
-                    <LabelList dataKey="Competitor" position="right" fill="#ffffff" />
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </ComparisonCard>
+          <MKBox mb={4}>
+            <MKTypography variant="h3" color="white" textAlign="center" fontWeight="bold">
+              PROSPERA Competitor Analysis
+            </MKTypography>
+          </MKBox>
+          <MKBox mb={4}>
+            <Table columns={columns} rows={rows} />
+          </MKBox>
+          <MKBox mb={4}>
+            <MKTypography variant="body2" color="white" textAlign="left">
+              The data used for the competitor analysis in the visualizations was constructed based
+              on a hypothetical comparison designed to illustrate how Prospera could be positioned
+              against other competitors like Yearn Finance, Alpha Finance, Rari Capital, and
+              BarnBridge. The analysis was completed by various A.I chatBots such as ChatGPT4o,
+              Claude.ai, and dolphin.
+            </MKTypography>
+          </MKBox>
+          <MKBox>
+            <MKTypography variant="body2" color="white" textAlign="left">
+              Based on the above data, Prospera consistently ranks at or near the top across all
+              categories, particularly excelling in Security Features and AI-Driven Strategies with
+              scores of 100% and 90%, respectively. Yearn Finance performs well in Staking Options
+              (90%) but lags slightly in Deflationary Tokenomics and Community Engagement. Rari
+              Capital and Alpha Finance show similar performance across most categories, while
+              BarnBridge has strong Security Features but generally scores lower in other areas.
+            </MKTypography>
+          </MKBox>
         </Grid>
       </Grid>
-
-      <Box mt={4} display="flex" justifyContent="center">
-        {competitors.map((company) => (
-          <CompanyButton
-            key={company}
-            active={company === selectedCompetitor}
-            onClick={() => setSelectedCompetitor(company)}
-          >
-            {company}
-          </CompanyButton>
-        ))}
-      </Box>
-
-      <Box mt={2} textAlign="center">
-        <MKTypography variant="h6" color="white">
-          <span style={{ color: chartColors.Prospera }}>PROSPERA</span> vs.{" "}
-          <span style={{ color: chartColors.Competitor }}>{selectedCompetitor}</span>
-        </MKTypography>
-      </Box>
-    </Box>
+    </Container>
   );
 };
 
-const StakingFeature = ({ title, description, icon, color }) => {
+const StakingFeature = ({ title, description, icon, color, titleColor }) => {
   return (
     <Box
       sx={{
@@ -269,7 +323,7 @@ const StakingFeature = ({ title, description, icon, color }) => {
     >
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         {icon}
-        <MKTypography variant="h6" color={color} ml={2} fontWeight="bold">
+        <MKTypography variant="h6" color={titleColor} ml={2} fontWeight="bold">
           {title}
         </MKTypography>
       </Box>
@@ -285,6 +339,7 @@ StakingFeature.propTypes = {
   description: PropTypes.string.isRequired,
   icon: PropTypes.node.isRequired,
   color: PropTypes.string.isRequired,
+  titleColor: PropTypes.string.isRequired,
 };
 
 const ProsperaStaking = () => {
@@ -404,9 +459,7 @@ const ProsperaStaking = () => {
           animation: "updown 2s calc(200ms * var(--i, 0)) ease-in-out infinite alternate",
         },
         "& #d-apps2wrapper g:nth-child(3) g > circle:nth-child(n), & #d-appswrapper g:nth-child(2) g > circle:nth-child(n)":
-          {
-            animation: "updown 2s calc(50ms * var(--i, 0)) ease infinite alternate",
-          },
+          { animation: "updown 2s calc(50ms * var(--i, 0)) ease infinite alternate" },
         "@keyframes updown": {
           "100%": {
             transform: "translate(0, -20px)",
@@ -478,6 +531,7 @@ const ProsperaStaking = () => {
                   />
                 }
                 color={colors.pros.main}
+                titleColor="#01ff02"
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -491,6 +545,7 @@ const ProsperaStaking = () => {
                   />
                 }
                 color={colors.pros.main}
+                titleColor="#01ff02"
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -504,6 +559,7 @@ const ProsperaStaking = () => {
                   />
                 }
                 color={colors.pros.main}
+                titleColor="#01ff02"
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -517,6 +573,7 @@ const ProsperaStaking = () => {
                   />
                 }
                 color={colors.pros.main}
+                titleColor="#01ff02"
               />
             </Grid>
           </Grid>
@@ -542,7 +599,7 @@ const ProsperaStaking = () => {
                 },
               }}
             >
-              Join Whitelist Now
+              Join ICO Now
             </MKButton>
           </MKBox>
         </Grid>

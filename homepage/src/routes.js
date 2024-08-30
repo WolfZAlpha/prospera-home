@@ -40,12 +40,10 @@ import Icon from "@mui/material/Icon";
 
 // Pages
 import AboutUs from "layouts/pages/company/about-us";
-import HelpCenter from "layouts/pages/support/help-center";
 import ContactUs from "layouts/pages/support/contact-us";
 import Faq from "layouts/pages/support/faq";
 import Privacy from "layouts/pages/support/privacy";
-import DesktopApp from "layouts/pages/apps/desktop-app";
-import VirtualRealityPage from "layouts/pages/virtual-reality";
+import AugmentedRealityPage from "layouts/pages/augmented-reality";
 
 // Account
 import SignInIllustration from "layouts/authentication/sign-in/illustration";
@@ -56,7 +54,7 @@ const routes = [
   {
     name: "pages",
     icon: <Icon>dashboard</Icon>,
-    columns: 3,
+    columns: 2,
     rowsPerColumn: 2,
     collapse: [
       {
@@ -72,11 +70,6 @@ const routes = [
       {
         name: "support",
         collapse: [
-          {
-            name: "help center",
-            route: "/pages/support/help-center",
-            component: <HelpCenter />,
-          },
           {
             name: "contact us",
             route: "/pages/support/contact-us",
@@ -98,14 +91,9 @@ const routes = [
         name: "apps",
         collapse: [
           {
-            name: "desktop app",
-            route: "/pages/apps/desktop-app",
-            component: <DesktopApp />,
-          },
-          {
-            name: "virtual reality",
-            route: "/pages/extra/virtual-reality",
-            component: <VirtualRealityPage />,
+            name: "augmented reality",
+            route: "/pages/augmented-reality",
+            component: <AugmentedRealityPage />,
           },
         ],
       },

@@ -30,41 +30,77 @@ import routes from "routes";
 
 function IllustrationLayout({ header, title, description, illustration, children }) {
   return (
-    <MKBox width="100%" height="100%" bgColor="white">
+    <MKBox width="100%" height="100vh" bgColor="#000000">
       <MKBox position="absolute" width="100%" mt={1}>
         <DefaultNavbar
           routes={routes}
           action={{
             type: "external",
-            route: "https://www.creative-tim.com/product/material-kit-pro-react",
+            route: "https://prosperaico.com",
             label: "buy now",
-            color: "dark",
+            color: "light",
           }}
         />
       </MKBox>
-      <Grid container>
+      <Grid container sx={{ height: "100%" }}>
         <Grid item xs={12} lg={6}>
           <MKBox
             display={{ xs: "none", lg: "flex" }}
-            width="calc(100% - 2rem)"
-            height="calc(100vh - 2rem)"
-            borderRadius="lg"
-            ml={2}
-            mt={2}
-            sx={{ backgroundImage: `url(${illustration})` }}
-          />
+            width="100%"
+            height="100%"
+            sx={{
+              backgroundImage: `url(${illustration.image})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
+            <MKBox
+              width="100%"
+              height="100%"
+              display="flex"
+              flexDirection="column"
+              justifyContent="center"
+              alignItems="center"
+              textAlign="center"
+              bgcolor="rgba(0, 0, 0, 0.7)"
+              p={4}
+            >
+              <MKTypography variant="h1" color="white" mb={3}>
+                {illustration.title}
+              </MKTypography>
+              <MKTypography variant="body1" color="white">
+                {illustration.description}
+              </MKTypography>
+            </MKBox>
+          </MKBox>
         </Grid>
-        <Grid item xs={11} sm={8} md={5} lg={4} xl={3} sx={{ mx: "auto" }}>
-          <MKBox display="flex" flexDirection="column" justifyContent="center" height="100vh">
-            <MKBox p={3} textAlign="center">
+        <Grid
+          item
+          xs={12}
+          lg={6}
+          sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+        >
+          <MKBox
+            width="100%"
+            maxWidth="400px"
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            p={3}
+            sx={{
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+              backdropFilter: "blur(10px)",
+              borderRadius: "10px",
+            }}
+          >
+            <MKBox textAlign="center" mb={3}>
               {!header ? (
                 <>
-                  <MKBox mb={1} textAlign="center">
-                    <MKTypography variant="h4" fontWeight="bold">
-                      {title}
-                    </MKTypography>
-                  </MKBox>
-                  <MKTypography variant="body2" color="text">
+                  <MKTypography variant="h3" color="white" fontWeight="bold" mb={1}>
+                    {title}
+                  </MKTypography>
+                  <MKTypography variant="body2" color="white" opacity={0.8}>
                     {description}
                   </MKTypography>
                 </>
@@ -72,7 +108,7 @@ function IllustrationLayout({ header, title, description, illustration, children
                 header
               )}
             </MKBox>
-            <MKBox p={3}>{children}</MKBox>
+            {children}
           </MKBox>
         </Grid>
       </Grid>
@@ -85,7 +121,11 @@ IllustrationLayout.defaultProps = {
   header: "",
   title: "",
   description: "",
-  illustration: "",
+  illustration: {
+    image: "",
+    title: "",
+    description: "",
+  },
 };
 
 // Typechecking props for the IllustrationLayout
@@ -94,7 +134,11 @@ IllustrationLayout.propTypes = {
   title: PropTypes.string,
   description: PropTypes.string,
   children: PropTypes.node.isRequired,
-  illustration: PropTypes.string,
+  illustration: PropTypes.shape({
+    image: PropTypes.string,
+    title: PropTypes.string,
+    description: PropTypes.string,
+  }),
 };
 
 export default IllustrationLayout;

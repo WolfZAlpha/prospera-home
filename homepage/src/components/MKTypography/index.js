@@ -64,6 +64,7 @@ MKTypography.propTypes = {
     "error",
     "light",
     "pros",
+    "black",
     "dark",
     "text",
     "white",
