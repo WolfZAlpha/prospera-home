@@ -1,4 +1,2 @@
 /node_modules
 package-lock.json
-.env
-server/config/keys/ed25519-private.key

@@ -7,14 +7,14 @@ import LinkIcon from "@mui/icons-material/Link";
 import MKTypography from "components/MKTypography";
 
 // Images
-import logoCT from "assets/images/logo-ct-dark.png";
+import logoPROS from "assets/images/logos/prospera.png";
 
 const date = new Date().getFullYear();
 
 export default {
   brand: {
     name: "PROSPERA",
-    image: logoCT,
+    image: logoPROS,
     route: "/",
   },
   socials: [
@@ -24,7 +24,7 @@ export default {
     },
     {
       icon: <TelegramIcon />,
-      link: "https://github.com/creativetimofficial",
+      link: "https://t.me/+R_npjjJkeOBhOWU8",
     },
     {
       icon: <LinkIcon />,
@@ -42,7 +42,7 @@ export default {
     {
       name: "apps",
       items: [
-        { name: "virtual reality", href: "https://vr.prosperadefi.com" },
+        { name: "augmented reality", href: "https://ar.prosperadefi.com" },
         { name: "dashboard", href: "https://dashboard.prosperadefi.com" },
       ],
     },

@@ -13,6 +13,7 @@
 */
 
 import { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 
 // rellax
 import Rellax from "rellax";
@@ -62,7 +63,7 @@ function AboutUs() {
   // Setting up typedJS
   useEffect(() => {
     const typedJS = new Typed(typedJSRef.current, {
-      strings: ["team", "design", "tool"],
+      strings: ["DeFi", "crypto", "and freedom"],
       typeSpeed: 90,
       backSpeed: 90,
       backDelay: 200,
@@ -117,30 +118,52 @@ function AboutUs() {
                 },
               })}
             >
-              Work with an amazing <span ref={typedJSRef} />
+              PROSPERA redefines <span ref={typedJSRef} />
             </MKTypography>
             <MKTypography variant="body1" color="white" opacity={0.8} mt={1} mb={3}>
-              We&apos;re constantly trying to express ourselves and actualize our dreams. If you
-              have the opportunity to play this game
+              We&apos;re constantly pushing the realms of what A.I can achieve.
             </MKTypography>
-            <MKButton color="default" sx={{ color: ({ palette: { dark } }) => dark.main }}>
+            <MKButton
+              component={Link}
+              to="/authentication/sign-up/cover"
+              color="default"
+              sx={{ color: ({ palette: { dark } }) => dark.main }}
+            >
               create account
             </MKButton>
             <MKTypography variant="h6" color="white" mt={8} mb={1}>
               Find us on
             </MKTypography>
             <MKBox display="flex" justifyContent="center" alignItems="center">
-              <MKTypography component="a" variant="body1" color="white" href="#" mr={3}>
-                <i className="fab fa-facebook" />
+              <MKTypography
+                component="a"
+                variant="body1"
+                color="white"
+                href="https://t.me/+R_npjjJkeOBhOWU8"
+                mr={3}
+              >
+                <i className="fab fa-telegram" />
               </MKTypography>
-              <MKTypography component="a" variant="body1" color="white" href="#" mr={3}>
-                <i className="fab fa-instagram" />
+              <MKTypography
+                component="a"
+                variant="body1"
+                color="white"
+                href="https://discord.com/invite/C2RfKePcWm"
+                mr={3}
+              >
+                <i className="fab fa-discord" />
               </MKTypography>
-              <MKTypography component="a" variant="body1" color="white" href="#" mr={3}>
+              <MKTypography
+                component="a"
+                variant="body1"
+                color="white"
+                href="https://x.com/ProsperaDefi"
+                mr={3}
+              >
                 <i className="fab fa-twitter" />
               </MKTypography>
               <MKTypography component="a" variant="body1" color="white" href="#">
-                <i className="fab fa-google-plus" />
+                <i className="fab fa-tiktok" />
               </MKTypography>
             </MKBox>
           </Grid>
