@@ -26,6 +26,7 @@ import { BetaProvider } from "contexts/BetaContext";
 
 export default function App() {
   const { pathname } = useLocation();
+  const isAugmentedRealitySubdomain = window.location.hostname === "ar.prosperadefi.com";
 
   useEffect(() => {
     document.documentElement.scrollTop = 0;
@@ -51,12 +52,18 @@ export default function App() {
         <BetaProvider>
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Routes>
-              {getRoutes(routes)}
-              <Route path="/home" element={<Home />} />
-              <Route path="/pages/augmented-reality" element={<AugmentedReality />} />
-              <Route path="*" element={<Navigate to="/home" />} />
-            </Routes>
+            {isAugmentedRealitySubdomain ? (
+              <Routes>
+                <Route path="*" element={<AugmentedReality />} />
+              </Routes>
+            ) : (
+              <Routes>
+                {getRoutes(routes)}
+                <Route path="/home" element={<Home />} />
+                <Route path="/pages/augmented-reality" element={<AugmentedReality />} />
+                <Route path="*" element={<Navigate to="/home" />} />
+              </Routes>
+            )}
           </ThemeProvider>
         </BetaProvider>
       </WalletProvider>

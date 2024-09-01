@@ -15,7 +15,6 @@
 // @mui material components
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
-import Icon from "@mui/material/Icon";
 
 // PROSPERA DEFI PLATFORM React components
 import MKBox from "components/MKBox";
@@ -67,21 +66,6 @@ function Team() {
       <Container sx={{ position: "relative", zIndex: 1 }}>
         <Grid container>
           <Grid item xs={12} md={8} sx={{ mb: 6 }}>
-            <MKBox
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              width="3rem"
-              height="3rem"
-              variant="gradient"
-              bgColor="info"
-              color="white"
-              shadow="md"
-              borderRadius="lg"
-              mb={2}
-            >
-              <Icon>supervisor_account</Icon>
-            </MKBox>
             <MKTypography variant="h3" color="white">
               The PROSPERA Team
             </MKTypography>
@@ -94,7 +78,7 @@ function Team() {
                 image={team1}
                 name="Z"
                 position={{ color: "pros", label: "Founder/Lead Dev & A.I Engineer" }}
-                description="Artist is a term applied to a person who engages in an activity deemed to be an art."
+                description="You conquer, or you're crushed—there’s no mercy for the weak, and no place in history for the defeated. PROSPERA will shatter the status-quo."
               />
             </MKBox>
           </Grid>
@@ -104,7 +88,7 @@ function Team() {
                 image={team2}
                 name="70neW0lf"
                 position={{ color: "pros", label: "CFO" }}
-                description="Artist is a term applied to a person who engages in an activity deemed to be an art."
+                description="All encompasing financial applications are the norm for Web2, and for Web3 to compete, you do need a DeFi protocol that bridges the gap."
               />
             </MKBox>
           </Grid>
@@ -114,7 +98,7 @@ function Team() {
                 image={team3}
                 name="Connor Kemet"
                 position={{ color: "pros", label: "COO" }}
-                description="Artist is a term applied to a person who engages in an activity deemed to be an art."
+                description="I'm the new guy."
               />
             </MKBox>
           </Grid>
@@ -124,7 +108,7 @@ function Team() {
                 image={team4}
                 name="RandOver"
                 position={{ color: "pros", label: "CMO" }}
-                description="Artist is a term applied to a person who engages in an activity deemed to be an art."
+                description="I'm the newest guy."
               />
             </MKBox>
           </Grid>
