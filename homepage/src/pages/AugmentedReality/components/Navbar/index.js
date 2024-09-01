@@ -7,7 +7,6 @@ import SmartToyIcon from "@mui/icons-material/SmartToy";
 import ChatIcon from "@mui/icons-material/Chat";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
 import EmailIcon from "@mui/icons-material/Email";
-import CloudIcon from "@mui/icons-material/Cloud";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PropTypes from "prop-types";
 
@@ -32,42 +31,45 @@ const NavItem = styled(IconButton)(({ theme }) => ({
   },
 }));
 
-const Navbar = ({ onItemClick, onDashboardClick }) => {
+const Navbar = ({
+  onItemClick,
+  onDashboardClick,
+  minimizedWindows,
+  onRobotToggle,
+  isRobotVisible,
+}) => {
   return (
     <NavbarContainer>
       <Tooltip title="To-Do List">
         <NavItem onClick={() => onItemClick("todoList")}>
-          <FormatListBulletedIcon />
+          <FormatListBulletedIcon
+            color={minimizedWindows.includes("todoList") ? "primary" : "inherit"}
+          />
         </NavItem>
       </Tooltip>
       <Tooltip title="To-Do Card">
         <NavItem onClick={() => onItemClick("todoCard")}>
-          <AssignmentIcon />
+          <AssignmentIcon color={minimizedWindows.includes("todoCard") ? "primary" : "inherit"} />
         </NavItem>
       </Tooltip>
-      <Tooltip title="OmniRobot">
-        <NavItem onClick={() => onItemClick("omniRobot")}>
-          <SmartToyIcon />
+      <Tooltip title={isRobotVisible ? "Hide OmniRobot" : "Show OmniRobot"}>
+        <NavItem onClick={onRobotToggle}>
+          <SmartToyIcon color={isRobotVisible ? "primary" : "inherit"} />
         </NavItem>
       </Tooltip>
       <Tooltip title="Chat">
         <NavItem onClick={() => onItemClick("chat")}>
-          <ChatIcon />
+          <ChatIcon color={minimizedWindows.includes("chat") ? "primary" : "inherit"} />
         </NavItem>
       </Tooltip>
       <Tooltip title="Media Player">
         <NavItem onClick={() => onItemClick("mediaPlayer")}>
-          <MusicNoteIcon />
+          <MusicNoteIcon color={minimizedWindows.includes("mediaPlayer") ? "primary" : "inherit"} />
         </NavItem>
       </Tooltip>
       <Tooltip title="Emails">
         <NavItem onClick={() => onItemClick("emails")}>
-          <EmailIcon />
-        </NavItem>
-      </Tooltip>
-      <Tooltip title="Weather">
-        <NavItem onClick={() => onItemClick("weather")}>
-          <CloudIcon />
+          <EmailIcon color={minimizedWindows.includes("emails") ? "primary" : "inherit"} />
         </NavItem>
       </Tooltip>
       <Tooltip title="Dashboard">
@@ -79,9 +81,12 @@ const Navbar = ({ onItemClick, onDashboardClick }) => {
   );
 };
 
-export default Navbar;
-
 Navbar.propTypes = {
   onItemClick: PropTypes.func.isRequired,
   onDashboardClick: PropTypes.func.isRequired,
+  minimizedWindows: PropTypes.arrayOf(PropTypes.string).isRequired,
+  onRobotToggle: PropTypes.func.isRequired,
+  isRobotVisible: PropTypes.bool.isRequired,
 };
+
+export default Navbar;

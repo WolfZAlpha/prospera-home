@@ -13,17 +13,16 @@ import Emails from "pages/AugmentedReality/components/Emails";
 import MediaPlayer from "pages/AugmentedReality/components/MediaPlayer";
 import Messages from "pages/AugmentedReality/components/Messages";
 import OmniRobot from "pages/AugmentedReality/components/omnRobot/OmniRobot";
-import WeatherWidget from "pages/AugmentedReality/components/WeatherWidget";
 
 // New components
 import Navbar from "./components/Navbar";
 import Desktop from "./components/Desktop";
 import Window from "./components/Window";
 import WelcomeMessage from "./components/WelcomeMessage";
+import DashboardBar from "./components/DashboardBar";
 
 // Images
 import bgImage from "assets/images/backgrounds/DesktopBackgrounds/Mountains/blackandwhitemountains.jpg";
-import sunCloud from "assets/images/small-logos/icon-sun-cloud.png";
 
 // Contexts
 import { AuthContext } from "contexts/AuthContext";
@@ -32,6 +31,9 @@ import { BetaContext } from "contexts/BetaContext";
 
 // API services
 import { fetchUserData, checkTokenHolding } from "services/api";
+
+// Custom styles
+import "assets/css/customStyles.css";
 
 const MemoizedOmniRobot = React.memo(OmniRobot);
 
@@ -43,10 +45,15 @@ function AugmentedReality() {
 
   const [userData, setUserData] = useState(null);
   const [openWindows, setOpenWindows] = useState({});
-  const [robotPosition, setRobotPosition] = useState({ x: 215, y: 1268.0 });
+  const [minimizedWindows, setMinimizedWindows] = useState([]);
+  const [windowPositions, setWindowPositions] = useState({});
+  const [windowSizes, setWindowSizes] = useState({});
+  const [robotPosition, setRobotPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRobotVisible, setIsRobotVisible] = useState(true);
   const dragOffset = useRef({ x: 0, y: 0 });
+  const containerRef = useRef(null);
 
   const currentUserData = userData || user;
 
@@ -85,9 +92,62 @@ function AugmentedReality() {
     initializeComponent();
   }, [user, authLoading, checkAuth, navigate]);
 
-  const toggleWindow = useCallback((appName) => {
-    setOpenWindows((prev) => ({ ...prev, [appName]: !prev[appName] }));
-  }, []);
+  const toggleWindow = useCallback(
+    (appName) => {
+      if (minimizedWindows.includes(appName)) {
+        setMinimizedWindows(minimizedWindows.filter((w) => w !== appName));
+        setOpenWindows((prev) => ({ ...prev, [appName]: true }));
+      } else if (openWindows[appName]) {
+        setMinimizedWindows([...minimizedWindows, appName]);
+      } else {
+        setOpenWindows({ ...openWindows, [appName]: true });
+        setWindowPositions((prev) => ({ ...prev, [appName]: { x: 50, y: 50 } }));
+        setWindowSizes((prev) => ({ ...prev, [appName]: { width: 400, height: 300 } }));
+      }
+    },
+    [openWindows, minimizedWindows]
+  );
+
+  const closeWindow = useCallback(
+    (appName) => {
+      const newOpenWindows = { ...openWindows };
+      delete newOpenWindows[appName];
+      setOpenWindows(newOpenWindows);
+      setMinimizedWindows(minimizedWindows.filter((w) => w !== appName));
+      setWindowPositions((prev) => {
+        const newPositions = { ...prev };
+        delete newPositions[appName];
+        return newPositions;
+      });
+      setWindowSizes((prev) => {
+        const newSizes = { ...prev };
+        delete newSizes[appName];
+        return newSizes;
+      });
+    },
+    [openWindows, minimizedWindows]
+  );
+
+  const handleMinimize = useCallback(
+    (appName) => {
+      setMinimizedWindows([...minimizedWindows, appName]);
+    },
+    [minimizedWindows]
+  );
+
+  const updateWindowPosition = useCallback(
+    (appName, position) => {
+      setWindowPositions({ ...windowPositions, [appName]: position });
+    },
+    [windowPositions]
+  );
+
+  const updateWindowSize = useCallback(
+    (appName, size) => {
+      setWindowSizes({ ...windowSizes, [appName]: size });
+    },
+    [windowSizes]
+  );
 
   const handleDashboardClick = useCallback(async () => {
     if (wallet && (await checkTokenHolding(wallet.address))) {
@@ -138,19 +198,36 @@ function AugmentedReality() {
     }
   }, [wallet, connectWallet, requestWhitelist]);
 
+  const toggleRobotVisibility = useCallback(() => {
+    setIsRobotVisible((prev) => !prev);
+  }, []);
+
+  const calculateInitialRobotPosition = useCallback(() => {
+    if (containerRef.current) {
+      const { width, height } = containerRef.current.getBoundingClientRect();
+      return {
+        x: width * 0.1,
+        y: height * 0.8,
+      };
+    }
+    return { x: 100, y: 500 };
+  }, []);
+
+  useEffect(() => {
+    setRobotPosition(calculateInitialRobotPosition());
+  }, [calculateInitialRobotPosition]);
+
   const welcomeElement = useMemo(
     () => (
       <MKBox
         sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
+          position: "relative",
+          top: "20%",
+          width: "100%",
           zIndex: 1000,
           display: "flex",
-          flexDirection: "column",
+          justifyContent: "center",
           alignItems: "center",
-          gap: 4,
         }}
       >
         <WelcomeMessage userName={currentUserData?.name || "User"} />
@@ -160,21 +237,29 @@ function AugmentedReality() {
   );
 
   const robotElement = useMemo(
-    () => (
-      <MKBox
-        sx={{
-          position: "fixed",
-          top: robotPosition.y,
-          left: robotPosition.x,
-          zIndex: 1000,
-          cursor: isDragging ? "grabbing" : "grab",
-        }}
-        onMouseDown={handleDragStart}
-      >
-        <MemoizedOmniRobot onPositionChange={handleRobotPositionChange} />
-      </MKBox>
-    ),
-    [robotPosition.x, robotPosition.y, isDragging, handleDragStart, handleRobotPositionChange]
+    () =>
+      isRobotVisible && (
+        <MKBox
+          sx={{
+            position: "fixed",
+            top: robotPosition.y,
+            left: robotPosition.x,
+            zIndex: 1000,
+            cursor: isDragging ? "grabbing" : "grab",
+          }}
+          onMouseDown={handleDragStart}
+        >
+          <MemoizedOmniRobot onPositionChange={handleRobotPositionChange} />
+        </MKBox>
+      ),
+    [
+      robotPosition.x,
+      robotPosition.y,
+      isDragging,
+      handleDragStart,
+      handleRobotPositionChange,
+      isRobotVisible,
+    ]
   );
 
   if (isLoading || authLoading) {
@@ -251,6 +336,7 @@ function AugmentedReality() {
 
   return (
     <MKBox
+      ref={containerRef}
       component="main"
       minHeight="100vh"
       width="100vw"
@@ -265,42 +351,34 @@ function AugmentedReality() {
       onMouseUp={handleDragEnd}
       onMouseLeave={handleDragEnd}
     >
+      {welcomeElement}
+      <DashboardBar />
       <Desktop>
-        {openWindows.todoList && (
-          <Window title="To-Do List" onClose={() => toggleWindow("todoList")}>
-            <TodoList />
-          </Window>
-        )}
-        {openWindows.todoCard && (
-          <Window title="To-Do Card" onClose={() => toggleWindow("todoCard")}>
-            <TodoCard />
-          </Window>
-        )}
-        {openWindows.emails && (
-          <Window title="Emails" onClose={() => toggleWindow("emails")}>
-            <Emails />
-          </Window>
-        )}
-        {openWindows.mediaPlayer && (
-          <Window title="Media Player" onClose={() => toggleWindow("mediaPlayer")}>
-            <MediaPlayer />
-          </Window>
-        )}
-        {openWindows.messages && (
-          <Window title="Messages" onClose={() => toggleWindow("messages")}>
-            <Messages />
-          </Window>
-        )}
-        {openWindows.weather && (
-          <Window title="Weather" onClose={() => toggleWindow("weather")}>
-            <WeatherWidget temperature="28°C" condition="cloudy" icon={sunCloud} />
-          </Window>
+        {Object.entries(openWindows).map(
+          ([appName, isOpen]) =>
+            isOpen &&
+            !minimizedWindows.includes(appName) && (
+              <Window
+                key={appName}
+                title={appName}
+                onClose={() => closeWindow(appName)}
+                onMinimize={() => handleMinimize(appName)}
+                initialPosition={windowPositions[appName]}
+                initialSize={windowSizes[appName]}
+                isMinimized={minimizedWindows.includes(appName)}
+                onPositionChange={(position) => updateWindowPosition(appName, position)}
+                onSizeChange={(size) => updateWindowSize(appName, size)}
+              >
+                {appName === "todoList" && <TodoList />}
+                {appName === "todoCard" && <TodoCard />}
+                {appName === "emails" && <Emails />}
+                {appName === "mediaPlayer" && <MediaPlayer />}
+                {appName === "messages" && <Messages />}
+              </Window>
+            )
         )}
       </Desktop>
-
-      {welcomeElement}
       {robotElement}
-
       <MKTypography
         variant="body2"
         color="white"
@@ -313,8 +391,13 @@ function AugmentedReality() {
       >
         Robot Position: X: {robotPosition.x.toFixed(2)}, Y: {robotPosition.y.toFixed(2)}
       </MKTypography>
-
-      <Navbar onItemClick={toggleWindow} onDashboardClick={handleDashboardClick} />
+      <Navbar
+        onItemClick={toggleWindow}
+        onDashboardClick={handleDashboardClick}
+        minimizedWindows={minimizedWindows}
+        onRobotToggle={toggleRobotVisibility}
+        isRobotVisible={isRobotVisible}
+      />
     </MKBox>
   );
 }

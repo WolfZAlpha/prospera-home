@@ -75,4 +75,14 @@ export const logoutUser = async () => {
   }
 };
 
+export const forgotPassword = async (email) => {
+  try {
+    const response = await api.post("/api/auth/password-forgot", { email });
+    return response.data;
+  } catch (error) {
+    console.error("Error requesting password reset:", error);
+    throw error;
+  }
+};
+
 export default api;
