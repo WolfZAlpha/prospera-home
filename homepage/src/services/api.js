@@ -34,9 +34,9 @@ export const fetchUserData = async (userId) => {
   }
 };
 
-export const checkTokenHolding = async (walletAddress) => {
+export const checkTokenHolding = async (arbitrumWallet) => {
   try {
-    const response = await api.get(`/api/wallet/${walletAddress}/token-holding`);
+    const response = await api.get(`/api/wallet/${arbitrumWallet}/token-holding`);
     return response.data.hasTokens;
   } catch (error) {
     console.error("Error checking token holding:", error);
@@ -46,10 +46,16 @@ export const checkTokenHolding = async (walletAddress) => {
 
 export const registerUser = async (userData) => {
   try {
+    console.log("Sending registration request to:", `${API_URL}/api/auth/register`);
+    console.log("Registration data:", userData);
+
     const response = await api.post("/api/auth/register", userData);
+
+    console.log("Registration response:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error registering user:", error);
+    console.error("Error response:", error.response);
     throw error;
   }
 };

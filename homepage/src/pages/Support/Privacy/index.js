@@ -22,8 +22,8 @@ import MKBox from "components/MKBox";
 import MKTypography from "components/MKTypography";
 
 // PROSPERA DEFI PLATFORM React examples
-import DefaultNavbar from "examples/Navbars/DefaultNavbar";
-import Footer from "../Footer";
+import DefaultNavbar from "components/DefaultNavbar";
+import Footer from "components/footer";
 
 // Routes
 import routes from "routes";

@@ -92,7 +92,7 @@ const routes = [
         collapse: [
           {
             name: "augmented reality",
-            route: "/pages/augmented-reality",
+            route: "/augmented-reality",
             component: <AugmentedRealityPage />,
           },
         ],

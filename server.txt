@@ -1,4 +1,4 @@
-All of the files and code in here belong to the server in the root directory: /server
+All of the files and code in here belong to the server in the root directory: prospera-home/server
 
 The structure of defining the files within this document is like this:
 
@@ -16,9 +16,33 @@ Let's Begin
 
 ------------------------------------------------------------------------------------
 
-File: server/src/landing/index.html
+File: prospera-home/prospera-home/server/prospera-home/server/config/keys/ed25519-private.key
 
-Code for file:
+Code for file: prospera-home/prospera-home/server/config/keys/ed25519-private.key
+
+```
+-----BEGIN PRIVATE KEY-----
+MC4CAQAwBQYDK2VwBCIEIC7D4PWXMY4gunLIOZsfPJfIs6jmpvygbGkwE0qYEMUO
+-----END PRIVATE KEY-----
+```
+
+------------------------------------------------------------------------------------
+
+File: prospera-home/prospera-home/server/config/keys/ed25519-public.key
+
+Code for file: prospera-home/prospera-home/server/config/keys/ed25519-public.key
+
+```
+-----BEGIN PUBLIC KEY-----
+MCowBQYDK2VwAyEAxqlveP5C0WL/hvKqiq6XJhtDI0Ofk3bVPAYNjJd6sxo=
+-----END PUBLIC KEY-----
+```
+
+------------------------------------------------------------------------------------
+
+File: prospera-home/prospera-home/server/src/landing/index.html
+
+Code for file: prospera-home/prospera-home/server/src/landing/index.html
 
 ```
 <!DOCTYPE html>
@@ -90,7 +114,7 @@ Code for file:
   <body>
     <div class="flex-center position-ref full-height">
       <div class="content">
-        <div class="title m-b-md">Headless CMS with ExpressJS API:PRO</div>
+        <div class="title m-b-md">PROSPERA DEFI</div>
 
         <div class="links">
           <a href="https://expressjs.com/" target="_blank">Express.js</a>
@@ -109,9 +133,9 @@ Code for file:
 
 ------------------------------------------------------------------------------------
 
-File: server/src/middleware/authMiddleware/index.js
+File: prospera-home/prospera-home/server/src/middleware/authMiddleware/index.js
 
-Code for file:
+Code for file: prospera-home/prospera-home/server/src/middleware/authMiddleware/index.js
 
 ```
 import { verifyToken } from "../../services/auth/index.js";
@@ -154,9 +178,9 @@ export const authorize = (...roles) => {
 
 ------------------------------------------------------------------------------------
 
-File: server/src/mongoose/clearDevDbs.js
+File: prospera-home/server/src/mongoose/clearDevDbs.js
 
-Code for file:
+Code for file: prospera-home/server/src/mongoose/clearDevDbs.js
 
 ```
 import mongoose from "mongoose";
@@ -195,9 +219,9 @@ clearDevDbs().then(() => {
 
 ------------------------------------------------------------------------------------
 
-File: server/src/mongoose/index.js
+File: prospera-home/server/src/mongoose/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/mongoose/index.js
 
 ```
 import mongoose from "mongoose";
@@ -234,13 +258,14 @@ export const dbConnect = async () => {
   });
 };
 
+
 ```
 
 ------------------------------------------------------------------------------------
 
-File: server/src/mongoose/RessedAction.js
+File: prospera-home/server/src/mongoose/RessedAction.js
 
-Code for file:
+Code for file: prospera-home/server/src/mongoose/RessedAction.js
 
 ```
 import bcrypt from "bcrypt";
@@ -585,126 +610,172 @@ export default ReseedAction;
 
 ------------------------------------------------------------------------------------
 
-File: server/src/mongoose/seedData.js
+File: prospera-home/server/src/mongoose/seedData.js
 
-Code for file:
+Code for file: prospera-home/server/src/mongoose/seedData.js
 
 ```
-import bcrypt from "bcrypt";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
 import mongoose from "mongoose";
-import { dbConnect } from "./index.js";
 
-import { userModel } from "../schemas/user.schema.js";
 import { roleModel } from "../schemas/role.schema.js";
 import { permissionModel } from "../schemas/permission.schema.js";
 
-import dotenv from "dotenv";
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-async function seedDB() {
-  // Connect to db
-  await dbConnect();
+// Load environment variables from the root .env file
+const envPath = path.join(__dirname, "..", "..", "..", ".env");
+console.log("Attempting to load .env file from:", envPath);
+console.log("Attempting to load .env file from:", envPath);
 
-  // Create admin user
-  const salt = await bcrypt.genSalt(10);
-  const hashPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, salt);
-  const admin = new userModel({
-    name: "Admin",
-    email: process.env.ADMIN_EMAIL,
-    password: hashPassword,
-    arbitrumWallet: process.env.ADMIN_WALLET,
-    role: "admin",
-    created_at: new Date(),
-    profile_image: `${process.env.APP_URL_API}/public/images/admin.jpg`,
-  });
-
-  // Define all permissions
-  const permissions = [
-    "view users",
-    "create users",
-    "edit users",
-    "delete users",
-    "view roles",
-    "create roles",
-    "edit roles",
-    "delete roles",
-    "view permissions",
-    "view tags",
-    "create tags",
-    "edit tags",
-    "delete tags",
-    "view categories",
-    "create categories",
-    "edit categories",
-    "delete categories",
-    "view items",
-    "create items",
-    "edit items",
-    "delete items",
-  ];
-
-  // Create permissions
-  const createdPermissions = await Promise.all(
-    permissions.map((name) =>
-      permissionModel.findOneAndUpdate(
-        { name },
-        { name, created_at: new Date() },
-        { upsert: true, new: true }
-      )
-    )
-  );
-
-  // Create role-permission mappings
-  const rolePermissions = {
-    admin: createdPermissions.map((perm) => perm._id),
-    prosperaTeam: createdPermissions
-      .filter(
-        (perm) => !perm.name.includes("users") && !perm.name.includes("roles")
-      )
-      .map((perm) => perm._id),
-    kol: createdPermissions
-      .filter(
-        (perm) =>
-          perm.name.startsWith("view") ||
-          perm.name.includes("create") ||
-          perm.name.includes("edit")
-      )
-      .map((perm) => perm._id),
-    user: createdPermissions
-      .filter((perm) => perm.name.startsWith("view"))
-      .map((perm) => perm._id),
-  };
-
-  // Create or update roles
-  for (const [roleName, permissions] of Object.entries(rolePermissions)) {
-    await roleModel.findOneAndUpdate(
-      { name: roleName },
-      {
-        name: roleName,
-        permissions: permissions,
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-      { upsert: true, new: true }
-    );
-  }
-
-  // Save admin user
-  await admin.save();
-
-  console.log("DB seeded with admin account, roles, and permissions");
+if (fs.existsSync(envPath)) {
+  console.log(".env file found");
+  dotenv.config({ path: envPath });
+  console.log("Environment variables loaded. DB_LINK:", process.env.DB_LINK);
+} else {
+  console.log(".env file not found");
+  console.log("Current working directory:", process.cwd());
+  console.log("__dirname:", __dirname);
+  process.exit(1);
 }
 
-seedDB().then(() => {
-  mongoose.connection.close();
-});
+async function dbConnect() {
+  try {
+    if (!process.env.DB_LINK) {
+      throw new Error("DB_LINK is not defined in the environment variables");
+    }
+
+    await mongoose.connect(process.env.DB_LINK, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      ssl: true,
+      tlsAllowInvalidCertificates: true,
+    });
+    console.log("MongoDB connection established successfully");
+  } catch (error) {
+    console.error("MongoDB connection error:", error);
+    process.exit(1);
+  }
+}
+
+async function seedDB() {
+  try {
+    // Connect to db
+    await dbConnect();
+
+    console.log("Connected to database. Starting seeding process...");
+
+    // Define all permissions
+    const permissions = [
+      "view users",
+      "create users",
+      "edit users",
+      "delete users",
+      "view roles",
+      "create roles",
+      "edit roles",
+      "delete roles",
+      "view permissions",
+      "view tags",
+      "create tags",
+      "edit tags",
+      "delete tags",
+      "view categories",
+      "create categories",
+      "edit categories",
+      "delete categories",
+      "view items",
+      "create items",
+      "edit items",
+      "delete items",
+    ];
+
+    console.log("Creating permissions...");
+    // Create permissions
+    const createdPermissions = await Promise.all(
+      permissions.map((name) =>
+        permissionModel.findOneAndUpdate(
+          { name },
+          { name, created_at: new Date(), updated_at: new Date() },
+          { upsert: true, new: true }
+        )
+      )
+    );
+
+    console.log(`Created ${createdPermissions.length} permissions.`);
+
+    // Create role-permission mappings
+    const rolePermissions = {
+      admin: createdPermissions.map((perm) => perm._id),
+      "co-admin": createdPermissions.map((perm) => perm._id),
+      prosperaTeam: createdPermissions
+        .filter(
+          (perm) => !perm.name.includes("users") && !perm.name.includes("roles")
+        )
+        .map((perm) => perm._id),
+      kol: createdPermissions
+        .filter(
+          (perm) =>
+            perm.name.startsWith("view") ||
+            perm.name.includes("create") ||
+            perm.name.includes("edit")
+        )
+        .map((perm) => perm._id),
+      member: createdPermissions
+        .filter((perm) => perm.name.startsWith("view"))
+        .map((perm) => perm._id),
+    };
+
+    console.log("Creating roles...");
+    // Create or update roles
+    const createdRoles = await Promise.all(
+      Object.entries(rolePermissions).map(([roleName, permissions]) =>
+        roleModel.findOneAndUpdate(
+          { name: roleName },
+          {
+            name: roleName,
+            permissions: permissions,
+            created_at: new Date(),
+            updated_at: new Date(),
+          },
+          { upsert: true, new: true }
+        )
+      )
+    );
+
+    console.log(`Created ${createdRoles.length} roles.`);
+
+    console.log("Seeding process completed successfully.");
+  } catch (error) {
+    console.error("An error occurred during the seeding process:", error);
+  } finally {
+    // Close the database connection
+    await mongoose.connection.close();
+    console.log("Database connection closed.");
+  }
+}
+
+// Run the seeding function
+seedDB()
+  .then(() => {
+    console.log("Seeding script finished execution.");
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error("Seeding script encountered an error:", error);
+    process.exit(1);
+  });
 ```
 
 ------------------------------------------------------------------------------------
 
-File: server/src/routes/auth/index.js
+File: prospera-home/server/src/routes/auth/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/routes/auth/index.js
 
 ```
 import express from "express";
@@ -713,11 +784,13 @@ import {
   loginRouteHandler,
   registerRouteHandler,
   resetPasswordRouteHandler,
+  checkAuthRouteHandler,
 } from "../../services/auth/index.js";
+import { verifyAuth } from "../../services/auth/index.js";
 
 const router = express.Router();
 
-router.post("/login", async (req, res, next) => {
+router.post("/login", async (req, res) => {
   console.log("Login route hit. Request body:", req.body);
   await loginRouteHandler(req, res);
 });
@@ -727,7 +800,16 @@ router.post("/logout", (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-  await registerRouteHandler(req, res);
+  try {
+    console.log("Register route hit. Request body:", req.body);
+    await registerRouteHandler(req, res);
+  } catch (error) {
+    console.error("Error in register route:", error);
+    res.status(500).json({
+      message: "Internal server error during registration",
+      error: error.message,
+    });
+  }
 });
 
 router.post("/password-forgot", async (req, res) => {
@@ -738,16 +820,34 @@ router.post("/password-reset", async (req, res) => {
   await resetPasswordRouteHandler(req, res);
 });
 
+// Add this new route
+router.get("/check", verifyAuth, async (req, res) => {
+  try {
+    const user = req.user;
+    const fullAccessRoles = ["admin", "co-admin", "prosperaTeam", "kol"];
+    const hasFullAccess =
+      fullAccessRoles.includes(user.role) || user.isWhitelisted;
+
+    res.json({
+      user: {
+        ...user,
+        hasFullAccess,
+      },
+    });
+  } catch (error) {
+    console.error("Error in checkAuthRouteHandler:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 export default router;
-
-
 ```
 
 ------------------------------------------------------------------------------------
 
-File: server/src/routes/categories/index.js
+File: prospera-home/server/src/routes/categories/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/routes/categories/index.js
 
 ```
 import express from "express";
@@ -808,14 +908,13 @@ router.delete(
 );
 
 export default router;
-
 ```
 
 ------------------------------------------------------------------------------------
 
-File: server/src/routes/images/index.js
+File: prospera-home/server/src/routes/images/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/routes/images/index.js
 
 ```
 import express from "express";
@@ -852,14 +951,13 @@ router.get("/:name", (req, res) => {
 });
 
 export default router;
-
 ```
 
 ------------------------------------------------------------------------------------
 
-File: server/src/routes/items/index.js
+File: prospera-home/server/src/routes/items/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/routes/items/index.js
 
 ```
 import express from "express";
@@ -933,14 +1031,13 @@ router.get(
 );
 
 export default router;
-
 ```
 
 ------------------------------------------------------------------------------------
 
-File: server/src/routes/me/index.js
+File: prospera-home/server/src/routes/me/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/routes/me/index.js
 
 ```
 import express from "express";
@@ -976,9 +1073,9 @@ export default router;
 
 ------------------------------------------------------------------------------------
 
-File: server/src/routes/permissions/index.js
+File: prospera-home/server/src/routes/permissions/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/routes/permissions/index.js
 
 ```
 import express from "express";
@@ -1001,9 +1098,9 @@ export default router;
 
 ------------------------------------------------------------------------------------
 
-File: server/src/routes/products/index.js
+File: prospera-home/server/src/routes/products/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/routes/products/index.js
 
 ```
 import express from "express";
@@ -1027,9 +1124,9 @@ export default router;
 
 ------------------------------------------------------------------------------------
 
-File: server/src/routes/roles/index.js
+File: prospera-home/server/src/routes/roles/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/routes/roles/index.js
 
 ```
 import express from "express";
@@ -1094,9 +1191,9 @@ export default router;
 
 ------------------------------------------------------------------------------------
 
-File: server/src/routes/settings/index.js
+File: prospera-home/server/src/routes/settings/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/routes/settings/index.js
 
 ```
 import express from "express";
@@ -1113,9 +1210,9 @@ export default router;
 
 ------------------------------------------------------------------------------------
 
-File: server/src/routes/tags/index.js
+File: prospera-home/server/src/routes/tags/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/routes/tags/index.js
 
 ```
 import express from "express";
@@ -1180,9 +1277,9 @@ export default router;
 
 ------------------------------------------------------------------------------------
 
-File: server/src/routes/uploads/index.js
+File: prospera-home/server/src/routes/uploads/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/routes/uploads/index.js
 
 ```
 import express from "express";
@@ -1250,9 +1347,9 @@ export default router;
 
 ------------------------------------------------------------------------------------
 
-File: server/src/routes/users/index.js
+File: prospera-home/server/src/routes/users/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/routes/users/index.js
 
 ```
 import express from "express";
@@ -1312,9 +1409,9 @@ export default router;
 
 ------------------------------------------------------------------------------------
 
-File: server/src/routes/index.js
+File: prospera-home/server/src/routes/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/routes/index.js
 
 ```
 import express from "express";
@@ -1333,14 +1430,13 @@ router.use("/settings", settingsRoutes);
 router.use("/products", productRoutes);
 
 export default router;
-
 ```
 
 ------------------------------------------------------------------------------------
 
-File: server/src/schemas/category.schema.js
+File: prospera-home/server/src/schemas/category.schema.js
 
-Code for file:
+Code for file: prospera-home/server/src/schemas/category.schema.js
 
 ```
 import mongoose from "mongoose";
@@ -1364,9 +1460,9 @@ export const categoryModel = mongoose.model("Category", categorySchema);
 
 ------------------------------------------------------------------------------------
 
-File: server/src/schemas/item.schema.js
+File: prospera-home/server/src/schemas/item.schema.js
 
-Code for file:
+Code for file: prospera-home/server/src/schemas/item.schema.js
 
 ```
 import mongoose from "mongoose";
@@ -1394,9 +1490,9 @@ export const itemModel = mongoose.model("Item", itemSchema);
 
 ------------------------------------------------------------------------------------
 
-File: server/src/schemas/passwordResets.schema.js
+File: prospera-home/server/src/schemas/passwordResets.schema.js
 
-Code for file:
+Code for file: prospera-home/server/src/schemas/passwordResets.schema.js
 
 ```
 import mongoose from "mongoose";
@@ -1421,9 +1517,9 @@ export const passwordResetModel = mongoose.model(
 
 ------------------------------------------------------------------------------------
 
-File: server/src/schemas/permission.schema.js
+File: prospera-home/server/src/schemas/permission.schema.js
 
-Code for file:
+Code for file: prospera-home/server/src/schemas/permission.schema.js
 
 ```
 import mongoose from "mongoose";
@@ -1445,9 +1541,9 @@ export const permissionModel = mongoose.model("Permission", permissionSchema);
 
 ------------------------------------------------------------------------------------
 
-File: server/src/schemas/product.schema.js
+File: prospera-home/server/src/schemas/product.schema.js
 
-Code for file:
+Code for file: prospera-home/server/src/schemas/product.schema.js
 
 ```
 import mongoose from "mongoose";
@@ -1468,9 +1564,9 @@ export const productModel = mongoose.model("Product", productSchema);
 
 ------------------------------------------------------------------------------------
 
-File: server/src/schemas/role.schema.js
-
-Code for file:
+File: prospera-home/server/src/schemas/role.schema.js
+ 
+Code for file: prospera-home/server/src/schemas/role.schema.js
 
 ```
 import mongoose from "mongoose";
@@ -1487,9 +1583,9 @@ export const roleModel = mongoose.model("Role", roleSchema);
 
 ------------------------------------------------------------------------------------
 
-File: server/src/schemas/tag.schema.js
+File: prospera-home/server/src/schemas/tag.schema.js
 
-Code for file:
+Code for file: prospera-home/server/src/schemas/tag.schema.js
 
 ```
 import mongoose from "mongoose";
@@ -1513,33 +1609,46 @@ export const tagModel = mongoose.model("Tag", tagSchema);
 
 ------------------------------------------------------------------------------------
 
-File: server/src/schemas/user.schema.js
+File: prospera-home/server/src/schemas/user.schema.js
 
-Code for file:
+Code for file: prospera-home/server/src/schemas/user.schema.js
 
 ```
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  username: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
+  name: { type: String, required: true, trim: true },
+  username: { type: String, required: true, unique: true, trim: true },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    lowercase: true,
+  },
   password: { type: String, required: true },
   role: {
     type: String,
-    enum: ["admin", "prosperaTeam", "kol", "user"],
-    default: "user",
+    enum: ["admin", "co-admin", "prosperaTeam", "kol", "member"],
+    default: "member",
   },
-  arbitrumWallet: { type: String, required: true, unique: true },
+  arbitrumWallet: { type: String, required: true, unique: true, trim: true },
   profileImage: { type: String },
   customSettings: {
     AugmentedReality: {
-      calendar: { type: Object },
-      todoList: [{ type: String }],
-      emailIntegration: { type: Object },
-      musicPlayer: { type: Object },
-      weather: { type: Object },
+      DashboardBar: { type: Object },
+      Desktop: { type: Object },
+      Emails: { type: Object },
+      MediaPlayer: { type: Object },
+      Messages: { type: Object },
+      Navbar: { type: Object },
+      omnRobot: { type: Object },
+      TodoCard: { type: Object },
+      TodoList: { type: Object },
+      WeatherForecast: { type: Object },
+      WelcomeMessage: { type: Object },
+      Window: { type: Object },
     },
     dashboard: { type: Object },
     portfolio: { type: Object },
@@ -1547,26 +1656,69 @@ const userSchema = new mongoose.Schema({
   prosTokenBalance: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date },
+  isWhitelisted: { type: Boolean, default: false },
 });
 
 userSchema.pre("save", async function (next) {
+  console.log(
+    "Pre-save hook called. isModified('password'):",
+    this.isModified("password")
+  );
   if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    console.log("Password hashed in pre-save hook:", this.password);
+    next();
+  } catch (error) {
+    console.error("Error in pre-save hook:", error);
+    next(error);
+  }
 });
 
 userSchema.methods.matchPassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+  try {
+    console.log("Entered password:", enteredPassword);
+    console.log("Stored hashed password:", this.password);
+
+    // Manual check
+    const manualHash = await bcrypt.hash(enteredPassword, 10);
+    console.log("Manually hashed entered password:", manualHash);
+
+    const isMatch = await bcrypt.compare(enteredPassword, this.password);
+    console.log("Password match result:", isMatch);
+
+    // Additional check
+    const additionalCheck = await bcrypt.compare(enteredPassword, manualHash);
+    console.log("Additional check result:", additionalCheck);
+
+    return isMatch;
+  } catch (error) {
+    console.error("Error comparing passwords:", error);
+    throw new Error("Error comparing passwords");
+  }
 };
+
+userSchema.methods.hasFullAccess = function () {
+  const fullAccessRoles = ["admin", "co-admin", "prosperaTeam", "kol"];
+  return fullAccessRoles.includes(this.role) || this.isWhitelisted;
+};
+
+userSchema.set("toJSON", {
+  transform: function (doc, ret, options) {
+    delete ret.password;
+    return ret;
+  },
+});
 
 export const userModel = mongoose.model("User", userSchema);
 ```
 
 ------------------------------------------------------------------------------------
 
-File: server/src/services/auth/index.js
+File: prospera-home/server/src/services/auth/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/services/auth/index.js
 
 ```
 import dotenv from "dotenv";
@@ -1651,7 +1803,10 @@ export async function verifyToken(token) {
 }
 
 export const loginRouteHandler = async (req, res) => {
-  console.log("Login handler. Request body:", req.body);
+  console.log(
+    "Login handler. Request body:",
+    JSON.stringify(req.body, null, 2)
+  );
   const { emailOrUsername, password } = req.body.data.attributes;
 
   console.log("Attempting to find user with:", { emailOrUsername });
@@ -1667,9 +1822,13 @@ export const loginRouteHandler = async (req, res) => {
     });
   }
 
-  console.log("User found, checking password");
+  console.log("User found:", JSON.stringify(foundUser, null, 2));
+  console.log("Stored hashed password:", foundUser.password);
+  console.log("Provided password:", password);
 
   const validPassword = await foundUser.matchPassword(password);
+  console.log("Password valid:", validPassword);
+
   if (!validPassword) {
     console.log("Invalid password");
     return res.status(400).json({
@@ -1718,65 +1877,91 @@ export const logoutRouteHandler = (req, res) => {
 };
 
 export const registerRouteHandler = async (req, res) => {
-  const { name, email, password, arbitrumWallet } = req.body.data.attributes;
+  try {
+    console.log(
+      "Registration attempt. Request body:",
+      JSON.stringify(req.body, null, 2)
+    );
+    const { name, email, password, arbitrumWallet, username } =
+      req.body.data.attributes;
 
-  let foundUser = await userModel.findOne({ email: email });
-  if (foundUser) {
-    return res.status(400).json({ message: "The email is already in use" });
-  }
+    console.log("Checking for existing user with email:", email);
+    let foundUser = await userModel.findOne({ email: email });
+    if (foundUser) {
+      console.log("User with this email already exists");
+      return res.status(400).json({ message: "The email is already in use" });
+    }
 
-  foundUser = await userModel.findOne({ arbitrumWallet: arbitrumWallet });
-  if (foundUser) {
-    return res
-      .status(400)
-      .json({ message: "The Arbitrum wallet is already in use" });
-  }
+    console.log(
+      "Checking for existing user with Arbitrum wallet:",
+      arbitrumWallet
+    );
+    foundUser = await userModel.findOne({ arbitrumWallet: arbitrumWallet });
+    if (foundUser) {
+      console.log("User with this Arbitrum wallet already exists");
+      return res
+        .status(400)
+        .json({ message: "The Arbitrum wallet is already in use" });
+    }
 
-  if (!password || password.length < 8) {
-    return res
-      .status(400)
-      .json({ message: "The password must be at least 8 characters long." });
-  }
+    if (!password || password.length < 8) {
+      console.log("Password is too short");
+      return res
+        .status(400)
+        .json({ message: "The password must be at least 8 characters long." });
+    }
 
-  const salt = await bcrypt.genSalt(10);
-  const hashPassword = await bcrypt.hash(password, salt);
+    console.log("Finding member role");
+    let memberRole = await roleModel.findOne({ name: "member" });
+    if (!memberRole) {
+      console.error("Member role not found");
+      return res.status(500).json({ message: "Error setting user role" });
+    }
 
-  let userRole = await roleModel.findOne({ name: "user" });
+    console.log("Creating new user");
+    const newUser = new userModel({
+      username,
+      name,
+      email,
+      password, // Using the plain password here
+      arbitrumWallet,
+      role: memberRole.name,
+    });
 
-  const newUser = new userModel({
-    name: name,
-    email: email,
-    password: hashPassword,
-    arbitrumWallet: arbitrumWallet,
-    role: userRole._id,
-  });
-  await newUser.save();
+    console.log("New user object:", JSON.stringify(newUser, null, 2));
 
-  const token = await generateToken({
-    id: newUser.id,
-    email: newUser.email,
-    role: newUser.role,
-  });
+    console.log("Saving new user to database");
+    await newUser.save();
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    domain: ".prosperadefi.com",
-    maxAge: 24 * 60 * 60 * 1000, // 1 day
-  });
+    console.log("User saved. Hashed password:", newUser.password);
 
-  return res.status(200).json({
-    message: "Registered successfully",
-    user: {
+    console.log("Generating token for new user");
+    const token = await generateToken({
       id: newUser.id,
-      name: newUser.name,
       email: newUser.email,
       role: newUser.role,
-      arbitrumWallet: newUser.arbitrumWallet,
-    },
-    token: token,
-  });
+    });
+
+    console.log("Registration successful");
+    return res.status(200).json({
+      message: "Registered successfully",
+      user: {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+        arbitrumWallet: newUser.arbitrumWallet,
+      },
+      token: token,
+    });
+  } catch (error) {
+    console.error("Error in registerRouteHandler:", error);
+    return res.status(500).json({
+      message: "An error occurred during registration",
+      error: error.message,
+      stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+    });
+  }
 };
 
 export const forgotPasswordRouteHandler = async (req, res) => {
@@ -1851,28 +2036,53 @@ export const resetPasswordRouteHandler = async (req, res) => {
 };
 
 export const verifyAuth = async (req, res, next) => {
-  const token = req.cookies.token;
+  const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
 
   if (!token) {
     return res.status(401).json({ message: "Authentication required" });
   }
 
-  const payload = await verifyToken(token);
-  if (!payload) {
-    return res.status(401).json({ message: "Invalid or expired token" });
-  }
+  try {
+    const payload = await verifyToken(token);
+    if (!payload) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
 
-  req.user = payload;
-  next();
+    req.user = payload;
+    next();
+  } catch (error) {
+    console.error("Error verifying auth:", error);
+    res.status(401).json({ message: "Authentication failed" });
+  }
+};
+
+export const checkAuthRouteHandler = async (req, res) => {
+  try {
+    // At this point, the user is already authenticated due to the verifyAuth middleware
+    const user = req.user;
+    const fullAccessRoles = ["admin", "co-admin", "prosperaTeam", "kol"];
+    const hasFullAccess =
+      fullAccessRoles.includes(user.role) || user.isWhitelisted;
+
+    res.json({
+      user: {
+        ...user,
+        hasFullAccess,
+      },
+    });
+  } catch (error) {
+    console.error("Error in checkAuthRouteHandler:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 ```
 
 ------------------------------------------------------------------------------------
 
-File: server/src/services/categories/index.js
+File: prospera-home/server/src/services/categories/index.js
 
-Code for file:
-
+Code for file: prospera-home/server/src/services/categories/index.js
+ 
 ```
 import { categoryModel } from "../../schemas/category.schema";
 
@@ -2087,9 +2297,9 @@ export const deleteCategoryRoute = async (req, res) => {
 
 ------------------------------------------------------------------------------------
 
-File: server/src/services/chat/index.js
+File: prospera-home/server/src/services/chat/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/services/chat/index.js
 
 ```
 import { Server } from "socket.io";
@@ -2118,9 +2328,10 @@ export const initializeChat = (server) => {
 
 ------------------------------------------------------------------------------------
 
-File: server/src/services/items/index.js
+File: prospera-home/server/src/services/items/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/services/items/index.js
+
 
 ```
 import dotenv from "dotenv";
@@ -2580,9 +2791,9 @@ export const deleteItemRoute = async (req, res) => {
 
 ------------------------------------------------------------------------------------
 
-File: server/src/services/me/index.js
+File: prospera-home/server/src/services/me/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/services/me/index.js
 
 ```
 import bcrypt from "bcrypt";
@@ -2737,9 +2948,9 @@ export const patchProfileRouteHandler = async (req, res) => {
 
 ------------------------------------------------------------------------------------
 
-File: server/src/services/permissions/index.js
+File: prospera-home/server/src/services/permissions/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/services/permissions/index.js
 
 ```
 import { permissionModel } from "../../schemas/permission.schema";
@@ -2792,9 +3003,9 @@ export const getPermissionsRoute = async (req, res) => {
 
 ------------------------------------------------------------------------------------
 
-File: server/src/services/products/index.js
+File: prospera-home/server/src/services/products/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/services/products/index.js
 
 ```
 import { productModel } from "../../schemas/product.schema.js";
@@ -2843,9 +3054,9 @@ export const deleteProduct = async (req, res) => {
 
 ------------------------------------------------------------------------------------
 
-File: server/src/services/roles/index.js
+File: prospera-home/server/src/services/roles/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/services/roles/index.js
 
 ```
 import dotenv from "dotenv";
@@ -3089,14 +3300,13 @@ export const deleteRoleRoute = async (req, res) => {
     }
   }
 };
-
 ```
 
 ------------------------------------------------------------------------------------
 
-File: server/src/services/settings/index.js
+File: prospera-home/server/src/services/settings/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/services/settings/index.js
 
 ```
 import { userModel } from "../../schemas/user.schema.js";
@@ -3153,9 +3363,9 @@ export const updateSpecificSettings = async (
 
 ------------------------------------------------------------------------------------
 
-File: server/src/services/tags/index.js
+File: prospera-home/server/src/services/tags/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/services/tags/index.js
 
 ```
 import { tagModel } from "../../schemas/tag.schema";
@@ -3337,9 +3547,9 @@ export const deleteTagRoute = async (req, res) => {
 
 ------------------------------------------------------------------------------------
 
-File: server/src/services/uploads/index.js
+File: prospera-home/server/src/services/uploads/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/services/uploads/index.js
 
 ```
 import dotenv from "dotenv";
@@ -3401,9 +3611,9 @@ export const setItemImage = async (randomId, req, res) => {
 
 ------------------------------------------------------------------------------------
 
-File: server/src/services/users/index.js
-
-Code for file:
+File: prospera-home/server/src/services/users/index.js
+ 
+Code for file: prospera-home/server/src/services/users/index.js
 
 ```
 import bcrypt from "bcrypt";
@@ -3572,80 +3782,100 @@ export const getUserRoute = async (req, res) => {
     }
   }
 
-  const user = await userModel
-    .findById(userId)
-    .populate("role")
-    .select(fieldsUser);
-  const role = await roleModel
-    .findOne({ _id: user.role })
-    .populate("permissions")
-    .select(fieldsRole);
-  let userPermissions = await permissionModel
-    .find({ _id: { $in: role["permissions"] } })
-    .select(fieldsPerms);
+  try {
+    const user = await userModel
+      .findById(userId)
+      .populate("role")
+      .select(fieldsUser);
 
-  if (fieldsRole) {
-    fieldObj = {
-      links: {
-        self: `${process.env.APP_URL_API}/${role.id}/relationships/roles`,
-        related: `${process.env.APP_URL_API}/${role.id}/roles`,
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const role = await roleModel
+      .findOne({ _id: user.role })
+      .populate("permissions")
+      .select(fieldsRole);
+
+    let userPermissions = await permissionModel
+      .find({ _id: { $in: role.permissions } })
+      .select(fieldsPerms);
+
+    const hasFullAccess =
+      ["admin", "co-admin", "prosperaTeam", "kol"].includes(role.name) ||
+      user.isWhitelisted;
+
+    if (fieldsRole) {
+      fieldObj = {
+        links: {
+          self: `${process.env.APP_URL_API}/${role.id}/relationships/roles`,
+          related: `${process.env.APP_URL_API}/${role.id}/roles`,
+        },
+      };
+    }
+
+    let sentData = {
+      type: "users",
+      id: userId,
+      attributes: {
+        ...user._doc,
+        roleName: role.name,
+        isWhitelisted: user.isWhitelisted,
+        hasFullAccess: hasFullAccess,
       },
     };
-  }
+    delete sentData.attributes.password;
 
-  let sentData = {
-    type: "users",
-    id: userId,
-    attributes: {
-      ...user._doc,
-    },
-  };
-  delete sentData.attributes.password;
-
-  if (options.length > 0) {
-    if (options.find((el) => el == "roles")) {
-      sentData = {
-        ...sentData,
-        relationships: {
-          roles: {
-            data: [
-              {
-                type: "roles",
-                id: role.id,
-              },
-            ],
-          },
-        },
-      };
-      includedDataRoles = {
-        type: "roles",
-        id: role.id,
-        attributes: {
-          ...role._doc,
-        },
-      };
-    }
-    if (options.find((el) => el == "roles.permissions")) {
-      let jsonArray = {};
-      includedDataPermissions = userPermissions.map((element) => {
-        let jsonObj = {
-          type: "permissions",
-          id: element.id,
-          attributes: {
-            name: element.name,
-            ...element._doc,
+    if (options.length > 0) {
+      if (options.includes("roles")) {
+        sentData = {
+          ...sentData,
+          relationships: {
+            roles: {
+              data: [
+                {
+                  type: "roles",
+                  id: role.id,
+                },
+              ],
+            },
           },
         };
-        return (jsonArray = { ...jsonArray, ...jsonObj });
-      });
+        includedDataRoles = {
+          type: "roles",
+          id: role.id,
+          attributes: {
+            ...role._doc,
+          },
+        };
+      }
+      if (options.includes("roles.permissions")) {
+        let jsonArray = {};
+        includedDataPermissions = userPermissions.map((element) => {
+          let jsonObj = {
+            type: "permissions",
+            id: element.id,
+            attributes: {
+              name: element.name,
+              ...element._doc,
+            },
+          };
+          return (jsonArray = { ...jsonArray, ...jsonObj });
+        });
+      }
     }
+
+    const finalData = {
+      data: { ...sentData },
+      relationships: { ...fieldObj },
+      included: [{ ...includedDataRoles }, ...includedDataPermissions],
+    };
+
+    return res.status(200).send(finalData);
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
-  const finalData = {
-    data: { ...sentData },
-    relationships: { ...fieldObj },
-    included: [{ ...includedDataRoles }, ...includedDataPermissions],
-  };
-  return res.status(200).send(finalData);
 };
 
 export const createUserRoute = async (req, res) => {
@@ -3817,34 +4047,58 @@ export const deleteUserRoute = async (req, res) => {
 
 ------------------------------------------------------------------------------------
 
-File: server/src/services/wallet/index.js
+File: prospera-home/server/src/services/wallet/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/services/wallet/index.js
 
 ```
-import Web3 from "web3";
+import axios from "axios";
 import { userModel } from "../../schemas/user.schema.js";
+import dotenv from "dotenv";
 
-const web3 = new Web3(process.env.ETHEREUM_RPC_URL);
+dotenv.config();
 
-export const connectWallet = async (userId, walletAddress) => {
+const ARBISCAN_API_URL = process.env.ARBISCAN_API_URL;
+const ARBISCAN_API_KEY = process.env.ARBISCAN_API_KEY;
+const PROS_TOKEN_CONTRACT = process.env.PROS_TOKEN_CONTRACT;
+
+export const connectWallet = async (userId, arbitrumWallet) => {
   const user = await userModel.findByIdAndUpdate(
     userId,
-    { walletAddress },
+    { arbitrumWallet },
     { new: true }
   );
   return user;
 };
 
-export const getTokenBalance = async (walletAddress) => {
-  const contract = new web3.eth.Contract(ABI, PROS_TOKEN_ADDRESS);
-  const balance = await contract.methods.balanceOf(walletAddress).call();
-  return web3.utils.fromWei(balance, "ether");
+export const getTokenBalance = async (arbitrumWallet) => {
+  try {
+    const response = await axios.get(ARBISCAN_API_URL, {
+      params: {
+        module: "account",
+        action: "tokenbalance",
+        contractaddress: PROS_TOKEN_CONTRACT,
+        address: arbitrumWallet,
+        tag: "latest",
+        apikey: ARBISCAN_API_KEY,
+      },
+    });
+
+    if (response.data.status === "1" && response.data.message === "OK") {
+      return response.data.result;
+    } else {
+      console.error("Error fetching token balance:", response.data.message);
+      return "0";
+    }
+  } catch (error) {
+    console.error("Error getting token balance:", error);
+    return "0";
+  }
 };
 
 export const updateUserTokenBalance = async (userId) => {
   const user = await userModel.findById(userId);
-  const balance = await getTokenBalance(user.walletAddress);
+  const balance = await getTokenBalance(user.arbitrumWallet);
   user.prosTokenBalance = balance;
   await user.save();
   return user;
@@ -3853,9 +4107,9 @@ export const updateUserTokenBalance = async (userId) => {
 
 ------------------------------------------------------------------------------------
 
-File: server/src/index.js
+File: prospera-home/server/src/index.js
 
-Code for file:
+Code for file: prospera-home/server/src/index.js
 
 ```
 import express from "express";
@@ -3879,25 +4133,50 @@ const __dirname = path.dirname(__filename);
 // Load environment variables from the root .env file
 dotenv.config({ path: path.join(__dirname, "..", "..", ".env") });
 
-const PORT = process.env.PORT || 8080;
+const config = {
+  port: process.env.PORT || 8080,
+  isDev: process.env.NODE_ENV === "development",
+  dbLink: process.env.DB_LINK,
+  jwtSecret: process.env.JWT_SECRET,
+  clientUrl:
+    process.env.NODE_ENV === "development"
+      ? process.env.APP_URL_CLIENT_DEV
+      : process.env.APP_URL_CLIENT,
+  dashboardUrl:
+    process.env.NODE_ENV === "development"
+      ? process.env.APP_URL_DASHBOARD_DEV
+      : process.env.APP_URL_DASHBOARD,
+  vrUrl:
+    process.env.NODE_ENV === "development"
+      ? process.env.APP_URL_VR_DEV
+      : process.env.APP_URL_VR,
+  apiUrl:
+    process.env.NODE_ENV === "development"
+      ? process.env.APP_URL_API_DEV
+      : process.env.APP_URL_API,
+};
+
 const app = express();
 const server = http.createServer(app);
 
-const isDev = process.env.NODE_ENV === "development";
-
 const whitelist = [
-  isDev ? process.env.APP_URL_CLIENT_DEV : process.env.APP_URL_CLIENT_PROD,
-  isDev
-    ? process.env.APP_URL_DASHBOARD_DEV
-    : process.env.APP_URL_DASHBOARD_PROD,
-  isDev ? process.env.APP_URL_VR_DEV : process.env.APP_URL_VR_PROD,
-  isDev ? process.env.APP_URL_API_DEV : process.env.APP_URL_API_PROD,
+  config.clientUrl,
+  config.dashboardUrl,
+  config.vrUrl,
+  config.apiUrl,
   "http://localhost:3000", // For local development
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin || whitelist.includes(origin)) {
+    const allowedOrigins = [
+      "https://prosperadefi.com",
+      "https://www.prosperadefi.com",
+      "https://api.prosperadefi.com",
+      "https://ar.prosperadefi.com",
+      "http://localhost:3000",
+    ];
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
@@ -3928,21 +4207,20 @@ const startServer = async () => {
 
     app.use("/api", routes);
 
+    // Serve static files from the React app
     app.use(express.static(path.join(__dirname, "../../homepage/build")));
 
-    app.get("*", (req, res) => {
-      const hostname = req.hostname;
-      const frontendUrl = isDev
-        ? process.env.APP_URL_CLIENT_DEV
-        : process.env.APP_URL_CLIENT_PROD;
-      const isMainDomain =
-        hostname === frontendUrl || hostname.endsWith("." + frontendUrl);
-
-      if (isMainDomain) {
-        res.sendFile(path.join(__dirname, "../../homepage/build/index.html"));
-      } else {
-        res.status(404).json({ message: "Not found" });
+    // Handle requests to the AR subdomain
+    app.use((req, res, next) => {
+      if (req.hostname === "ar.prosperadefi.com") {
+        req.url = "/augmented-reality";
       }
+      next();
+    });
+
+    // The "catchall" handler: for any request that doesn't match one above, send back React's index.html file.
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(__dirname, "../../homepage/build/index.html"));
     });
 
     if (process.env.SCHEDULE_HOUR) {
@@ -3957,20 +4235,17 @@ const startServer = async () => {
       console.error("Error:", err);
       res.status(err.status || 500).json({
         message: err.message || "Internal Server Error",
-        stack: isDev ? err.stack : "🥞",
+        stack: config.isDev ? err.stack : "🥞",
       });
     });
 
-    server.listen(PORT, () => {
-      console.log(`Server listening on port ${PORT}`);
+    server.listen(config.port, () => {
+      console.log(`Server listening on port ${config.port}`);
       console.log("Environment:", process.env.NODE_ENV);
-      console.log("DB_LINK:", process.env.DB_LINK ? "Set" : "Not set");
-      console.log(
-        "APP_URL_CLIENT:",
-        isDev ? process.env.APP_URL_CLIENT_DEV : process.env.APP_URL_CLIENT_PROD
-      );
+      console.log("DB_LINK:", config.dbLink ? "Set" : "Not set");
+      console.log("APP_URL_CLIENT:", config.clientUrl);
       console.log("CORS Whitelist:", whitelist);
-      console.log("API Base URL:", `http://localhost:${PORT}/api`);
+      console.log("API Base URL:", `${config.apiUrl}/api`);
     });
   } catch (error) {
     console.error("Failed to start the server:", error);
@@ -3983,9 +4258,9 @@ startServer();
 
 ------------------------------------------------------------------------------------
 
-File: server/src/passport.js
+File: prospera-home/server/src/passport.js
 
-Code for file:
+Code for file: prospera-home/server/src/passport.js
 
 ```
 import { ExtractJwt } from "passport-jwt";
@@ -4034,54 +4309,9 @@ passport.use(
 
 export default passport;
 ```
-
 ------------------------------------------------------------------------------------
 
-File: server/.env
-
-Code for file:
-
-```
-# Database Configuration
-DB_HOST=db-mongodb-nyc1-83629-6a0bd76f.mongo.ondigitalocean.com
-DB_PORT=27017
-DB_USER=doapps-601b68d4-8bd7-42cf-9f41-46f8be378f6d
-DB_PASSWORD=LAIs9k01dp4762q5
-DB_NAME=admin
-DB_LINK=mongodb+srv://doapps-601b68d4-8bd7-42cf-9f41-46f8be378f6d:LAIs9k01dp4762q5@db-mongodb-nyc1-83629-6a0bd76f.mongo.ondigitalocean.com/admin?authSource=admin&tls=true
-
-# JWT Configuration
-JWT_SECRET="30dc73af4750af81a83562fec01d0795c88478e10b396710e6bbe019be2c0386fb048d878746ae4011e9c2dad0260252123e90e01fde066bae1a7b1f5f4920f4c7b8187e75c15c656770ce2a60534d5f123178f05f5f9254df4b34142cd7e77922db425a6132e51e004182e7332dc1624ab4b3839c535ac7b1391457d3ea9f72"
-
-# URL Configuration
-APP_URL_CLIENT_PROD=https://www.prosperadefi.com
-APP_URL_API_PROD=https://api.prosperadefi.com
-APP_URL_DASHBOARD_PROD=https://dashboard.prosperadefi.com
-APP_URL_VR_PROD=https://vr.prosperadefi.com
-
-APP_URL_CLIENT_DEV=http://localhost:3000
-APP_URL_API_DEV=http://localhost:8080
-APP_URL_DASHBOARD_DEV=http://localhost:3001
-APP_URL_VR_DEV=http://localhost:3002
-
-# Environment
-NODE_ENV=development
-
-# Mailtrap Configuration
-MAILTRAP_HOST=live.smtp.mailtrap.io
-MAILTRAP_PORT=587
-MAILTRAP_USER=api
-MAILTRAP_PASS=03215ebc81b1c94c07faa9a5bc383ba7
-
-# Admin Configuration
-ADMIN_EMAIL=zed.wolf@prosperadefi.com
-ADMIN_PASSWORD=Y0uw1l1n3v3rrfigurethis0u7!
-ADMIN_WALLET=0x2186381a0079f2b73546b977eC8b0197C530c006
-```
-
-------------------------------------------------------------------------------------
-
-File: server/ecosystem.config.json
+File: prospera-home/server/ecosystem.config.json
 
 Code for file:
 
@@ -4095,34 +4325,52 @@ Code for file:
       "node_args": "--es-module-specifier-resolution=node",
       "watch": false,
       "force": true,
-      "env": {
-        "PORT": 8080,
+      "env_production": {
         "NODE_ENV": "production",
-        "DB_LINK": "mongodb+srv://doapps-601b68d4-8bd7-42cf-9f41-46f8be378f6d:LAIs9k01dp4762q5@db-mongodb-nyc1-83629-6a0bd76f.mongo.ondigitalocean.com/admin?authSource=admin&tls=true",
+        "PORT": 8080,
         "DB_HOST": "db-mongodb-nyc1-83629-6a0bd76f.mongo.ondigitalocean.com",
-        "DB_PORT": "27017",
+        "DB_PORT": 27017,
         "DB_USER": "doapps-601b68d4-8bd7-42cf-9f41-46f8be378f6d",
         "DB_PASSWORD": "LAIs9k01dp4762q5",
         "DB_NAME": "admin",
+        "DB_LINK": "mongodb+srv://doapps-601b68d4-8bd7-42cf-9f41-46f8be378f6d:LAIs9k01dp4762q5@db-mongodb-nyc1-83629-6a0bd76f.mongo.ondigitalocean.com/admin?authSource=admin&tls=true",
         "JWT_SECRET": "30dc73af4750af81a83562fec01d0795c88478e10b396710e6bbe019be2c0386fb048d878746ae4011e9c2dad0260252123e90e01fde066bae1a7b1f5f4920f4c7b8187e75c15c656770ce2a60534d5f123178f05f5f9254df4b34142cd7e77922db425a6132e51e004182e7332dc1624ab4b3839c535ac7b1391457d3ea9f72",
         "APP_URL_CLIENT": "https://www.prosperadefi.com",
         "APP_URL_API": "https://api.prosperadefi.com",
         "APP_URL_DASHBOARD": "https://dashboard.prosperadefi.com",
         "APP_URL_VR": "https://vr.prosperadefi.com",
         "MAILTRAP_HOST": "live.smtp.mailtrap.io",
-        "MAILTRAP_PORT": "587",
+        "MAILTRAP_PORT": 587,
+        "MAILTRAP_USER": "api",
+        "MAILTRAP_PASS": "03215ebc81b1c94c07faa9a5bc383ba7"
+      },
+      "env_development": {
+        "NODE_ENV": "development",
+        "PORT": 8080,
+        "DB_HOST": "db-mongodb-nyc1-83629-6a0bd76f.mongo.ondigitalocean.com",
+        "DB_PORT": 27017,
+        "DB_USER": "doapps-601b68d4-8bd7-42cf-9f41-46f8be378f6d",
+        "DB_PASSWORD": "LAIs9k01dp4762q5",
+        "DB_NAME": "admin",
+        "DB_LINK": "mongodb+srv://doapps-601b68d4-8bd7-42cf-9f41-46f8be378f6d:LAIs9k01dp4762q5@db-mongodb-nyc1-83629-6a0bd76f.mongo.ondigitalocean.com/admin?authSource=admin&tls=true",
+        "JWT_SECRET": "30dc73af4750af81a83562fec01d0795c88478e10b396710e6bbe019be2c0386fb048d878746ae4011e9c2dad0260252123e90e01fde066bae1a7b1f5f4920f4c7b8187e75c15c656770ce2a60534d5f123178f05f5f9254df4b34142cd7e77922db425a6132e51e004182e7332dc1624ab4b3839c535ac7b1391457d3ea9f72",
+        "APP_URL_CLIENT": "http://localhost:3000",
+        "APP_URL_API": "http://localhost:8080",
+        "APP_URL_DASHBOARD": "http://localhost:3001",
+        "APP_URL_VR": "http://localhost:3002",
+        "MAILTRAP_HOST": "live.smtp.mailtrap.io",
+        "MAILTRAP_PORT": 587,
         "MAILTRAP_USER": "api",
         "MAILTRAP_PASS": "03215ebc81b1c94c07faa9a5bc383ba7"
       }
     }
   ]
 }
-
 ```
 
 ------------------------------------------------------------------------------------
 
-File: server/package.json
+File: prospera-home/server/package.json
 
 Code for file:
 
@@ -4175,52 +4423,71 @@ Code for file:
 }
 ```
 
-------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
 
-File: PROSPERA/package.json
+File: prospera-home/.env
 
 Code for file:
 
 ```
-{
-  "name": "prospera-platform",
-  "version": "1.0.0",
-  "private": true,
-  "workspaces": [
-    "homepage",
-    "server"
-  ],
-  "scripts": {
-    "start": "node server/src/index.js",
-    "start:dev": "concurrently \"npm run start:server\" \"npm run start:homepage\"",
-    "start:server": "cd server && npm run start:dev",
-    "start:homepage": "cd homepage && npm start",
-    "build": "npm run build:homepage",
-    "build:homepage": "cd homepage && npm run build",
-    "install:all": "npm install && npm run install:homepage && npm run install:server",
-    "install:homepage": "cd homepage && npm install",
-    "install:server": "cd server && npm install",
-    "lint": "npm run lint:homepage && npm run lint:server",
-    "lint:homepage": "cd homepage && npm run lint",
-    "lint:server": "cd server && eslint .",
-    "prettify": "npm run prettify:homepage && npm run prettify:server",
-    "prettify:homepage": "cd homepage && npm run prettify",
-    "prettify:server": "cd server && prettier --write ."
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "devDependencies": {
-    "concurrently": "^8.2.1",
-    "eslint": "^8.38.0",
-    "prettier": "^2.8.7"
-  },
-  "dependencies": {
-    "cookie-parser": "^1.4.6",
-    "jose": "^5.7.0",
-    "jsonwebtoken": "^9.0.2",
-    "react-draggable": "^4.4.6",
-    "web3": "^4.12.1"
-  }
-}
+# Environment
+NODE_ENV=development
+REACT_APP_NODE_ENV=development
+PORT=8080
+
+# Database Configuration
+DB_HOST=db-mongodb-nyc1-83629-6a0bd76f.mongo.ondigitalocean.com
+DB_USER=doadmin
+DB_PASSWORD=1oZ934jW570OG6pf
+DB_NAME=admin
+DB_LINK=mongodb+srv://doadmin:1oZ934jW570OG6pf@db-mongodb-nyc1-83629-6a0bd76f.mongo.ondigitalocean.com/admin?authSource=admin&tls=true
+
+# JWT Configuration
+JWT_SECRET=30dc73af4750af81a83562fec01d0795c88478e10b396710e6bbe019be2c0386fb048d878746ae4011e9c2dad0260252123e90e01fde066bae1a7b1f5f4920f4c7b8187e75c15c656770ce2a60534d5f123178f05f5f9254df4b34142cd7e77922db425a6132e51e004182e7332dc1624ab4b3839c535ac7b1391457d3ea9f72
+
+# URL Configuration (Frontend)
+REACT_APP_URL_CLIENT=https://www.prosperadefi.com
+REACT_APP_URL_API=https://api.prosperadefi.com
+REACT_APP_URL_DASHBOARD=https://dashboard.prosperadefi.com
+REACT_APP_URL_TEAMDASHBOARD=https://td.prosperadefi.com
+REACT_APP_URL_VR=https://ar.prosperadefi.com
+
+# URL Configuration (Backend)
+APP_URL_CLIENT=https://www.prosperadefi.com
+APP_URL_API=https://api.prosperadefi.com
+APP_URL_DASHBOARD=https://dashboard.prosperadefi.com
+APP_URL_TEAMDASHBOARD=https://td.prosperadefi.com
+APP_URL_VR=https://ar.prosperadefi.com
+
+# Development URLs (for reference)
+APP_URL_CLIENT_DEV=http://localhost:3000
+APP_URL_API_DEV=http://localhost:8080
+APP_URL_DASHBOARD_DEV=http://localhost:3001
+APP_URL_VR_DEV=http://localhost:3002
+APP_URL_TEAMDASHBOARD_DEV=http://localhost:3003
+
+# Mailtrap Configuration
+MAILTRAP_HOST=live.smtp.mailtrap.io
+MAILTRAP_PORT=587
+MAILTRAP_USER=api
+MAILTRAP_PASS=03215ebc81b1c94c07faa9a5bc383ba7
+
+# Admin Configuration
+ADMIN_EMAIL=zed.wolf@prosperadefi.com
+ADMIN_PASSWORD=Y0uw1l1n3v3rrfigurethis0u7!
+ADMIN_WALLET=0x2186381a0079f2b73546b977eC8b0197C530c006
+
+# Arbiscan and Token Configuration (Frontend)
+REACT_APP_ARBISCAN_API_URL=https://api.arbiscan.io/api
+REACT_APP_ARBISCAN_API_KEY=8FJC44BEQGFIUCE483KV2KD51F4H5IBJJJ
+REACT_APP_PROS_TOKEN_CONTRACT=0x4fd38270BAF7E61453BA9555c6e17512a6db9b30
+REACT_APP_MIN_TOKEN_BALANCE=5000
+
+# Arbiscan and Token Configuration (Backend)
+ARBISCAN_API_URL=https://api.arbiscan.io/api
+ARBISCAN_API_KEY=8FJC44BEQGFIUCE483KV2KD51F4H5IBJJJ
+PROS_TOKEN_CONTRACT=0x4fd38270BAF7E61453BA9555c6e17512a6db9b30
+MIN_TOKEN_BALANCE=5000
 ```
+
+

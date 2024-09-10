@@ -25,7 +25,7 @@ import HorizontalTeamCard from "./HorizontalTeamCard";
 
 // Images
 import team1 from "./TeamPics/z.jpg";
-import team2 from "assets/images/bruce-mars.jpg";
+import team2 from "./TeamPics/7w.jpg";
 import team3 from "./TeamPics/ck.jpg";
 import team4 from "./TeamPics/ro.jpg";
 

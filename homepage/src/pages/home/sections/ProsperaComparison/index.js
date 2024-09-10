@@ -276,7 +276,7 @@ const CompetitorComparison = () => {
             <Table columns={columns} rows={rows} />
           </MKBox>
           <MKBox mb={4}>
-            <MKTypography variant="body2" color="white" textAlign="left">
+            <MKTypography variant="caption" color="white" textAlign="left">
               The data used for the competitor analysis in the visualizations was constructed based
               on a hypothetical comparison designed to illustrate how Prospera could be positioned
               against other competitors like Yearn Finance, Alpha Finance, Rari Capital, and
@@ -285,7 +285,7 @@ const CompetitorComparison = () => {
             </MKTypography>
           </MKBox>
           <MKBox>
-            <MKTypography variant="body2" color="white" textAlign="left">
+            <MKTypography variant="caption" color="white" textAlign="left">
               Based on the above data, Prospera consistently ranks at or near the top across all
               categories, particularly excelling in Security Features and AI-Driven Strategies with
               scores of 100% and 90%, respectively. Yearn Finance performs well in Staking Options

@@ -35,17 +35,17 @@ export const BetaProvider = ({ children }) => {
     setHasFullAccess(fullAccessRoles.includes(user.role) || isWhitelisted);
   };
 
-  const requestWhitelist = async (walletAddress) => {
+  const requestWhitelist = async (arbitrumWallet) => {
     try {
-      const holdsSufficientPROS = await checkTokenHolding(walletAddress);
+      const holdsSufficientPROS = await checkTokenHolding(arbitrumWallet);
       if (holdsSufficientPROS) {
         const response = await axios.post(`/api/users/${user.id}/request-whitelist`, {
-          walletAddress,
+          arbitrumWallet,
         });
         setHasRequestedWhitelist(true);
         alert(response.data.message);
       } else {
-        const balance = await getTokenBalance(walletAddress);
+        const balance = await getTokenBalance(arbitrumWallet);
         alert(
           `To be considered for whitelisting, you must hold at least 5000 $PROS tokens. Your current balance is ${balance} $PROS. Please visit https://www.prosperaico.com to purchase more $PROS tokens and then come back to re-submit for whitelisting.`
         );

@@ -32,8 +32,8 @@ import MKTypography from "components/MKTypography";
 import MKButton from "components/MKButton";
 
 // PROSPERA DEFI PLATFORM React examples
-import DefaultNavbar from "examples/Navbars/DefaultNavbar";
-import Footer from "./Footer";
+import DefaultNavbar from "components/DefaultNavbar";
+import Footer from "components/footer";
 
 // About Us page sections
 import Information from "pages/Company/AboutUs/sections/Information";
@@ -81,8 +81,8 @@ function AboutUs() {
         action={{
           type: "external",
           route: "https://www.prosperaico.com",
-          label: "buy now",
-          color: "black",
+          label: "join ico",
+          color: "pros",
         }}
         sticky
       />

@@ -18,7 +18,7 @@ import MKBox from "components/MKBox";
 import MKInput from "components/MKInput";
 import MKButton from "components/MKButton";
 import MKTypography from "components/MKTypography";
-import DefaultNavbar from "examples/Navbars/DefaultNavbar";
+import DefaultNavbar from "components/DefaultNavbar";
 import routes from "routes";
 import { forgotPassword } from "services/api";
 

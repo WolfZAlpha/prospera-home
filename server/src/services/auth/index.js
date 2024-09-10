@@ -80,7 +80,10 @@ export async function verifyToken(token) {
 }
 
 export const loginRouteHandler = async (req, res) => {
-  console.log("Login handler. Request body:", req.body);
+  console.log(
+    "Login handler. Request body:",
+    JSON.stringify(req.body, null, 2)
+  );
   const { emailOrUsername, password } = req.body.data.attributes;
 
   console.log("Attempting to find user with:", { emailOrUsername });
@@ -96,7 +99,7 @@ export const loginRouteHandler = async (req, res) => {
     });
   }
 
-  console.log("User found, checking password");
+  console.log("User found:", JSON.stringify(foundUser, null, 2));
   console.log("Stored hashed password:", foundUser.password);
   console.log("Provided password:", password);
 
@@ -151,65 +154,91 @@ export const logoutRouteHandler = (req, res) => {
 };
 
 export const registerRouteHandler = async (req, res) => {
-  const { name, email, password, arbitrumWallet } = req.body.data.attributes;
+  try {
+    console.log(
+      "Registration attempt. Request body:",
+      JSON.stringify(req.body, null, 2)
+    );
+    const { name, email, password, arbitrumWallet, username } =
+      req.body.data.attributes;
 
-  let foundUser = await userModel.findOne({ email: email });
-  if (foundUser) {
-    return res.status(400).json({ message: "The email is already in use" });
-  }
+    console.log("Checking for existing user with email:", email);
+    let foundUser = await userModel.findOne({ email: email });
+    if (foundUser) {
+      console.log("User with this email already exists");
+      return res.status(400).json({ message: "The email is already in use" });
+    }
 
-  foundUser = await userModel.findOne({ arbitrumWallet: arbitrumWallet });
-  if (foundUser) {
-    return res
-      .status(400)
-      .json({ message: "The Arbitrum wallet is already in use" });
-  }
+    console.log(
+      "Checking for existing user with Arbitrum wallet:",
+      arbitrumWallet
+    );
+    foundUser = await userModel.findOne({ arbitrumWallet: arbitrumWallet });
+    if (foundUser) {
+      console.log("User with this Arbitrum wallet already exists");
+      return res
+        .status(400)
+        .json({ message: "The Arbitrum wallet is already in use" });
+    }
 
-  if (!password || password.length < 8) {
-    return res
-      .status(400)
-      .json({ message: "The password must be at least 8 characters long." });
-  }
+    if (!password || password.length < 8) {
+      console.log("Password is too short");
+      return res
+        .status(400)
+        .json({ message: "The password must be at least 8 characters long." });
+    }
 
-  const salt = await bcrypt.genSalt(10);
-  const hashPassword = await bcrypt.hash(password, salt);
+    console.log("Finding member role");
+    let memberRole = await roleModel.findOne({ name: "member" });
+    if (!memberRole) {
+      console.error("Member role not found");
+      return res.status(500).json({ message: "Error setting user role" });
+    }
 
-  let userRole = await roleModel.findOne({ name: "user" });
+    console.log("Creating new user");
+    const newUser = new userModel({
+      username,
+      name,
+      email,
+      password, // Using the plain password here
+      arbitrumWallet,
+      role: memberRole.name,
+    });
 
-  const newUser = new userModel({
-    name: name,
-    email: email,
-    password: hashPassword,
-    arbitrumWallet: arbitrumWallet,
-    role: userRole._id,
-  });
-  await newUser.save();
+    console.log("New user object:", JSON.stringify(newUser, null, 2));
 
-  const token = await generateToken({
-    id: newUser.id,
-    email: newUser.email,
-    role: newUser.role,
-  });
+    console.log("Saving new user to database");
+    await newUser.save();
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    domain: ".prosperadefi.com",
-    maxAge: 24 * 60 * 60 * 1000, // 1 day
-  });
+    console.log("User saved. Hashed password:", newUser.password);
 
-  return res.status(200).json({
-    message: "Registered successfully",
-    user: {
+    console.log("Generating token for new user");
+    const token = await generateToken({
       id: newUser.id,
-      name: newUser.name,
       email: newUser.email,
       role: newUser.role,
-      arbitrumWallet: newUser.arbitrumWallet,
-    },
-    token: token,
-  });
+    });
+
+    console.log("Registration successful");
+    return res.status(200).json({
+      message: "Registered successfully",
+      user: {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+        arbitrumWallet: newUser.arbitrumWallet,
+      },
+      token: token,
+    });
+  } catch (error) {
+    console.error("Error in registerRouteHandler:", error);
+    return res.status(500).json({
+      message: "An error occurred during registration",
+      error: error.message,
+      stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+    });
+  }
 };
 
 export const forgotPasswordRouteHandler = async (req, res) => {

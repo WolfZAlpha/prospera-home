@@ -10,7 +10,7 @@ import { verifyAuth } from "../../services/auth/index.js";
 
 const router = express.Router();
 
-router.post("/login", async (req, res, next) => {
+router.post("/login", async (req, res) => {
   console.log("Login route hit. Request body:", req.body);
   await loginRouteHandler(req, res);
 });
@@ -20,7 +20,16 @@ router.post("/logout", (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-  await registerRouteHandler(req, res);
+  try {
+    console.log("Register route hit. Request body:", req.body);
+    await registerRouteHandler(req, res);
+  } catch (error) {
+    console.error("Error in register route:", error);
+    res.status(500).json({
+      message: "Internal server error during registration",
+      error: error.message,
+    });
+  }
 });
 
 router.post("/password-forgot", async (req, res) => {

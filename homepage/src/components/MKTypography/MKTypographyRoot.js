@@ -37,7 +37,7 @@ export default styled(Typography)(({ theme, ownerState }) => {
     backgroundImage:
       color !== "inherit" && color !== "text" && color !== "white" && gradients[color]
         ? linearGradient(gradients[color].main, gradients[color].state)
-        : linearGradient(gradients.dark.main, gradients.dark.state),
+        : linearGradient(gradients.pros.main, gradients.pros.state),
     display: "inline-block",
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: transparent.main,

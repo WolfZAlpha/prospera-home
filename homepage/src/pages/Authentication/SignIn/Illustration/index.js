@@ -9,7 +9,7 @@ import MKBox from "components/MKBox";
 import MKTypography from "components/MKTypography";
 import MKInput from "components/MKInput";
 import MKButton from "components/MKButton";
-import DefaultNavbar from "examples/Navbars/DefaultNavbar";
+import DefaultNavbar from "components/DefaultNavbar";
 
 // Routes
 import routes from "routes";
@@ -30,17 +30,24 @@ function SignIn() {
     setError("");
 
     try {
-      console.log("Attempting to sign in with:", { emailOrUsername, password });
+      console.log("Attempting to sign in with:", { emailOrUsername, password: "REDACTED" });
 
       const response = await login(emailOrUsername, password);
 
-      console.log("Sign-in response:", response);
+      console.log("Sign-in response:", JSON.stringify(response, null, 2));
 
       if (response.message === "Logged in successfully") {
-        navigate("/pages/augmented-reality");
+        if (process.env.NODE_ENV === "development") {
+          navigate("/pages/augmented-reality");
+        } else {
+          window.location.href = "https://ar.prosperadefi.com";
+        }
       }
     } catch (err) {
       console.error("Login error:", err);
+      if (err.response) {
+        console.error("Error response:", JSON.stringify(err.response.data, null, 2));
+      }
       setError(err.message || "An error occurred during sign in");
     }
   };

@@ -15,7 +15,7 @@
 // PROSPERA DEFI PLATFORM Base Styles
 import colors from "assets/theme/base/colors";
 
-const { info, dark } = colors;
+const { info, pros } = colors;
 
 export default {
   html: {
@@ -29,7 +29,7 @@ export default {
     textDecoration: "none !important",
   },
   "a.link, .link, a.link:link, .link:link, a.link:visited, .link:visited": {
-    color: `${dark.main} !important`,
+    color: `${pros.main} !important`,
     transition: "color 150ms ease-in !important",
   },
   "a.link:hover, .link:hover, a.link:focus, .link:focus": {

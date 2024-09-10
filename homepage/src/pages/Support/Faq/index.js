@@ -18,15 +18,11 @@ import { useState } from "react";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
-
-// PROSPERA DEFI PLATFORM React components
 import MKBox from "components/MKBox";
 import MKTypography from "components/MKTypography";
-
-// PROSPERA DEFI PLATFORM React examples
-import DefaultNavbar from "examples/Navbars/DefaultNavbar";
-import Footer from "../Footer";
-import SimpleInfoCard from "examples/Cards/InfoCards/SimpleInfoCard";
+import DefaultNavbar from "components/DefaultNavbar";
+import Footer from "components/footer";
+import SimpleInfoCard from "components/Cards/InfoCards/SimpleInfoCard";
 
 // HelpCenter page components
 import FaqCollapse from "pages/Support/Faq/components/FaqCollapse";

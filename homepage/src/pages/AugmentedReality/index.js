@@ -30,7 +30,8 @@ import { WalletContext } from "contexts/WalletContext";
 import { BetaContext } from "contexts/BetaContext";
 
 // API services
-import { fetchUserData, checkTokenHolding } from "services/api";
+import { fetchUserData } from "services/api";
+import { getTokenBalance, checkTokenHolding } from "services/tokenService";
 
 // Custom styles
 import "assets/css/customStyles.css";
@@ -39,8 +40,14 @@ const MemoizedOmniRobot = React.memo(OmniRobot);
 
 function AugmentedReality() {
   const navigate = useNavigate();
-  const { user, loading: authLoading, checkAuth } = useContext(AuthContext);
-  const { wallet, connectWallet } = useContext(WalletContext);
+  const {
+    user,
+    loading: authLoading,
+    checkAuth,
+    isInitialized,
+    isLoading: authIsLoading,
+  } = useContext(AuthContext);
+  const { wallet } = useContext(WalletContext);
   const { isBetaMode, requestWhitelist } = useContext(BetaContext);
 
   const [userData, setUserData] = useState(null);
@@ -52,16 +59,56 @@ function AugmentedReality() {
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isRobotVisible, setIsRobotVisible] = useState(true);
+  const [tokenBalance, setTokenBalance] = useState("0");
+  const [userDataLoading, setUserDataLoading] = useState(true);
   const dragOffset = useRef({ x: 0, y: 0 });
   const containerRef = useRef(null);
 
-  const currentUserData = userData || user;
+  const [storedUser, setStoredUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+
+  const currentUserData = userData || user || storedUser || null;
+
+  const fetchTokenBalance = useCallback(async () => {
+    if (currentUserData && currentUserData.arbitrumWallet) {
+      try {
+        const balance = await getTokenBalance(currentUserData.arbitrumWallet);
+        setTokenBalance(balance);
+        console.log("Fetched token balance:", balance);
+      } catch (error) {
+        console.error("Error fetching token balance:", error);
+        setTokenBalance("0");
+      }
+    } else {
+      console.log("No user data or arbitrum wallet found");
+      setTokenBalance("0");
+    }
+  }, [currentUserData]);
+
+  useEffect(() => {
+    if (currentUserData) {
+      fetchTokenBalance();
+    }
+  }, [currentUserData, fetchTokenBalance]);
+
+  useEffect(() => {
+    if (!user) {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        setStoredUser(JSON.parse(storedUser));
+      }
+    }
+  }, [user]);
 
   useEffect(() => {
     const initializeComponent = async () => {
       console.log("Initializing AugmentedReality component");
       console.log("Auth loading:", authLoading);
       console.log("User:", user);
+      console.log("Is initialized:", isInitialized);
+      console.log("Auth is loading:", authIsLoading);
 
       if (!user) {
         console.log("No user found, re-checking authentication");
@@ -69,7 +116,7 @@ function AugmentedReality() {
           await checkAuth();
         } catch (error) {
           console.error("Authentication check failed:", error);
-          navigate("/login");
+          navigate("/authentication/sign-in/illustration");
           return;
         }
       }
@@ -80,17 +127,26 @@ function AugmentedReality() {
           const data = await fetchUserData(user.id);
           console.log("User data loaded:", data);
           setUserData(data.data.attributes);
+
+          if (data.data.attributes.arbitrumWallet) {
+            const balance = await getTokenBalance(data.data.attributes.arbitrumWallet);
+            setTokenBalance(balance);
+            console.log("Token balance fetched:", balance);
+          }
         } catch (error) {
           console.error("Error fetching user data:", error);
           setUserData(user);
         }
       }
 
+      setUserDataLoading(false);
       setIsLoading(false);
     };
 
-    initializeComponent();
-  }, [user, authLoading, checkAuth, navigate]);
+    if (isInitialized && !authIsLoading) {
+      initializeComponent();
+    }
+  }, [user, authLoading, checkAuth, navigate, isInitialized, authIsLoading]);
 
   const toggleWindow = useCallback(
     (appName) => {
@@ -188,15 +244,30 @@ function AugmentedReality() {
   );
 
   const handleRequestWhitelist = useCallback(async () => {
-    if (!wallet) {
-      await connectWallet();
-    }
-    if (wallet) {
-      await requestWhitelist(wallet.address);
-    } else {
+    if (!currentUserData || !currentUserData.arbitrumWallet) {
       alert("Please connect your wallet to request whitelist access.");
+      return;
     }
-  }, [wallet, connectWallet, requestWhitelist]);
+
+    try {
+      const hasTokens = await checkTokenHolding(currentUserData.arbitrumWallet);
+      const tokenBalance = await getTokenBalance(currentUserData.arbitrumWallet);
+
+      if (hasTokens) {
+        await requestWhitelist(currentUserData.arbitrumWallet);
+        alert(
+          `Your whitelist request has been submitted. You currently hold ${tokenBalance} $PROS tokens.`
+        );
+      } else {
+        alert(
+          `To participate in the beta, you need at least 5000 $PROS tokens. Your current balance is ${tokenBalance} $PROS. Please visit https://www.prosperaico.com to purchase more $PROS tokens.`
+        );
+      }
+    } catch (error) {
+      console.error("Error checking token balance or requesting whitelist:", error);
+      alert("An error occurred while processing your request. Please try again later.");
+    }
+  }, [currentUserData, requestWhitelist]);
 
   const toggleRobotVisibility = useCallback(() => {
     setIsRobotVisible((prev) => !prev);
@@ -262,7 +333,46 @@ function AugmentedReality() {
     ]
   );
 
-  if (isLoading || authLoading) {
+  const checkBetaAccess = useCallback(() => {
+    const hasFullAccess =
+      ["admin", "co-admin", "prosperaTeam", "kol"].includes(currentUserData?.role) ||
+      currentUserData?.isWhitelisted;
+
+    if (isBetaMode && !hasFullAccess) {
+      return (
+        <MKBox
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="100vh"
+          sx={{
+            backgroundImage: `url(${bgImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <MKBox bgColor="white" borderRadius="xl" shadow="lg" p={4} textAlign="center">
+            <MKTypography variant="h4" mb={2}>
+              Beta Access Required
+            </MKTypography>
+            <MKTypography variant="body1" mb={3}>
+              {currentUserData?.hasRequestedWhitelist
+                ? "Your whitelist request is being processed. Please check back later."
+                : "You are not an approved member to access during beta-testing."}
+            </MKTypography>
+            {!currentUserData?.hasRequestedWhitelist && (
+              <MKButton variant="gradient" color="info" onClick={handleRequestWhitelist}>
+                Request Whitelist Access
+              </MKButton>
+            )}
+          </MKBox>
+        </MKBox>
+      );
+    }
+    return null;
+  }, [isBetaMode, currentUserData, handleRequestWhitelist]);
+
+  if (authIsLoading || isLoading || userDataLoading) {
     return (
       <MKBox display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
         <MKTypography variant="h4">Loading...</MKTypography>
@@ -270,7 +380,7 @@ function AugmentedReality() {
     );
   }
 
-  if (!user && !userData) {
+  if (!currentUserData) {
     return (
       <MKBox
         display="flex"
@@ -290,7 +400,11 @@ function AugmentedReality() {
           <MKTypography variant="body1" mb={3}>
             To access the Augmented Reality page, you must be signed in.
           </MKTypography>
-          <MKButton variant="gradient" color="info" onClick={() => navigate("/login")}>
+          <MKButton
+            variant="gradient"
+            color="info"
+            onClick={() => navigate("/authentication/sign-in/illustration")}
+          >
             Sign In
           </MKButton>
         </MKBox>
@@ -298,41 +412,8 @@ function AugmentedReality() {
     );
   }
 
-  const hasFullAccess =
-    ["admin", "co-admin", "prosperaTeam", "kol"].includes(currentUserData.role) ||
-    currentUserData.isWhitelisted;
-
-  if (isBetaMode && !hasFullAccess) {
-    return (
-      <MKBox
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
-        sx={{
-          backgroundImage: `url(${bgImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <MKBox bgColor="white" borderRadius="xl" shadow="lg" p={4} textAlign="center">
-          <MKTypography variant="h4" mb={2}>
-            Beta Access Required
-          </MKTypography>
-          <MKTypography variant="body1" mb={3}>
-            {currentUserData.hasRequestedWhitelist
-              ? "Your whitelist request is being processed. Please check back later."
-              : "You are not an approved member to access during beta-testing."}
-          </MKTypography>
-          {!currentUserData.hasRequestedWhitelist && (
-            <MKButton variant="gradient" color="info" onClick={handleRequestWhitelist}>
-              Request Whitelist Access
-            </MKButton>
-          )}
-        </MKBox>
-      </MKBox>
-    );
-  }
+  const betaAccessCheck = checkBetaAccess();
+  if (betaAccessCheck) return betaAccessCheck;
 
   return (
     <MKBox
@@ -390,6 +471,18 @@ function AugmentedReality() {
         }}
       >
         Robot Position: X: {robotPosition.x.toFixed(2)}, Y: {robotPosition.y.toFixed(2)}
+      </MKTypography>
+      <MKTypography
+        variant="body2"
+        color="white"
+        sx={{
+          position: "absolute",
+          top: 5,
+          right: 20,
+          zIndex: 1001,
+        }}
+      >
+        $PROS Balance: {tokenBalance}
       </MKTypography>
       <Navbar
         onItemClick={toggleWindow}

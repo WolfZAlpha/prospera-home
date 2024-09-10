@@ -15,7 +15,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import MKBox from "components/MKBox";
-import DefaultNavbar from "examples/Navbars/DefaultNavbar";
+import DefaultNavbar from "components/DefaultNavbar";
 import routes from "routes";
 
 function CoverLayout({ children }) {

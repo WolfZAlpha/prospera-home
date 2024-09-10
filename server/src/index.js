@@ -27,19 +27,23 @@ const config = {
   clientUrl:
     process.env.NODE_ENV === "development"
       ? process.env.APP_URL_CLIENT_DEV
-      : process.env.APP_URL_CLIENT_PROD,
+      : process.env.APP_URL_CLIENT,
   dashboardUrl:
     process.env.NODE_ENV === "development"
       ? process.env.APP_URL_DASHBOARD_DEV
-      : process.env.APP_URL_DASHBOARD_PROD,
+      : process.env.APP_URL_DASHBOARD,
   vrUrl:
     process.env.NODE_ENV === "development"
       ? process.env.APP_URL_VR_DEV
-      : process.env.APP_URL_VR_PROD,
+      : process.env.APP_URL_VR,
   apiUrl:
     process.env.NODE_ENV === "development"
       ? process.env.APP_URL_API_DEV
-      : process.env.APP_URL_API_PROD,
+      : process.env.APP_URL_API,
+  teamDashboardUrl:
+    process.env.NODE_ENV === "development"
+      ? process.env.APP_URL_TEAMDASHBOARD_DEV
+      : process.env.APP_URL_TEAMDASHBOARD,
 };
 
 const app = express();
@@ -50,19 +54,23 @@ const whitelist = [
   config.dashboardUrl,
   config.vrUrl,
   config.apiUrl,
-  "http://localhost:3000", // For local development
+  config.teamDashboardUrl,
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://localhost:3002",
+  "http://localhost:3003",
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin || whitelist.includes(origin)) {
+    if (!origin || whitelist.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
   exposedHeaders: ["set-cookie"],
 };
@@ -86,19 +94,20 @@ const startServer = async () => {
 
     app.use("/api", routes);
 
+    // Serve static files from the React app
     app.use(express.static(path.join(__dirname, "../../homepage/build")));
 
-    app.get("*", (req, res) => {
-      const hostname = req.hostname;
-      const isMainDomain =
-        hostname === config.clientUrl ||
-        hostname.endsWith("." + config.clientUrl);
-
-      if (isMainDomain) {
-        res.sendFile(path.join(__dirname, "../../homepage/build/index.html"));
-      } else {
-        res.status(404).json({ message: "Not found" });
+    // Handle requests to the AR subdomain
+    app.use((req, res, next) => {
+      if (req.hostname === "ar.prosperadefi.com") {
+        req.url = "/augmented-reality";
       }
+      next();
+    });
+
+    // The "catchall" handler: for any request that doesn't match one above, send back React's index.html file.
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(__dirname, "../../homepage/build/index.html"));
     });
 
     if (process.env.SCHEDULE_HOUR) {

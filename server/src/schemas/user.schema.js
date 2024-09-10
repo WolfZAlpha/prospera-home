@@ -2,24 +2,37 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  username: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
+  name: { type: String, required: true, trim: true },
+  username: { type: String, required: true, unique: true, trim: true },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    lowercase: true,
+  },
   password: { type: String, required: true },
   role: {
     type: String,
-    enum: ["admin", "co-admin", "prosperaTeam", "kol", "user"],
-    default: "user",
+    enum: ["admin", "co-admin", "prosperaTeam", "kol", "member"],
+    default: "member",
   },
-  arbitrumWallet: { type: String, required: true, unique: true },
+  arbitrumWallet: { type: String, required: true, unique: true, trim: true },
   profileImage: { type: String },
   customSettings: {
     AugmentedReality: {
-      calendar: { type: Object },
-      todoList: [{ type: String }],
-      emailIntegration: { type: Object },
-      musicPlayer: { type: Object },
-      weather: { type: Object },
+      DashboardBar: { type: Object },
+      Desktop: { type: Object },
+      Emails: { type: Object },
+      MediaPlayer: { type: Object },
+      Messages: { type: Object },
+      Navbar: { type: Object },
+      omnRobot: { type: Object },
+      TodoCard: { type: Object },
+      TodoList: { type: Object },
+      WeatherForecast: { type: Object },
+      WelcomeMessage: { type: Object },
+      Window: { type: Object },
     },
     dashboard: { type: Object },
     portfolio: { type: Object },
@@ -27,21 +40,59 @@ const userSchema = new mongoose.Schema({
   prosTokenBalance: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date },
+  isWhitelisted: { type: Boolean, default: false },
 });
 
 userSchema.pre("save", async function (next) {
+  console.log(
+    "Pre-save hook called. isModified('password'):",
+    this.isModified("password")
+  );
   if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    console.log("Password hashed in pre-save hook:", this.password);
+    next();
+  } catch (error) {
+    console.error("Error in pre-save hook:", error);
+    next(error);
+  }
 });
 
 userSchema.methods.matchPassword = async function (enteredPassword) {
-  console.log("Comparing passwords:");
-  console.log("Entered password:", enteredPassword);
-  console.log("Stored hashed password:", this.password);
-  const isMatch = await bcrypt.compare(enteredPassword, this.password);
-  console.log("Password match result:", isMatch);
-  return isMatch;
+  try {
+    console.log("Entered password:", enteredPassword);
+    console.log("Stored hashed password:", this.password);
+
+    // Manual check
+    const manualHash = await bcrypt.hash(enteredPassword, 10);
+    console.log("Manually hashed entered password:", manualHash);
+
+    const isMatch = await bcrypt.compare(enteredPassword, this.password);
+    console.log("Password match result:", isMatch);
+
+    // Additional check
+    const additionalCheck = await bcrypt.compare(enteredPassword, manualHash);
+    console.log("Additional check result:", additionalCheck);
+
+    return isMatch;
+  } catch (error) {
+    console.error("Error comparing passwords:", error);
+    throw new Error("Error comparing passwords");
+  }
 };
+
+userSchema.methods.hasFullAccess = function () {
+  const fullAccessRoles = ["admin", "co-admin", "prosperaTeam", "kol"];
+  return fullAccessRoles.includes(this.role) || this.isWhitelisted;
+};
+
+userSchema.set("toJSON", {
+  transform: function (doc, ret, options) {
+    delete ret.password;
+    return ret;
+  },
+});
 
 export const userModel = mongoose.model("User", userSchema);

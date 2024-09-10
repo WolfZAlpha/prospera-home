@@ -27,8 +27,8 @@ import MKTypography from "components/MKTypography";
 import MKButton from "components/MKButton";
 
 // PROSPERA DEFI PLATFORM React examples
-import DefaultNavbar from "examples/Navbars/DefaultNavbar";
-import Footer from "./sections/footer";
+import DefaultNavbar from "components/DefaultNavbar";
+import Footer from "components/footer";
 
 // Presentation page sections
 import ProsperaEcoSystem from "pages/home/sections/ProsperaEcoSystem";

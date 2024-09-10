@@ -143,8 +143,8 @@ export default {
     },
 
     pros: {
-      main: "#000000",
-      state: "#01ff02",
+      main: "#01ff02",
+      state: "#000000",
     },
   },
 

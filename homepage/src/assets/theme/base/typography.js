@@ -24,7 +24,7 @@ import colors from "assets/theme/base/colors";
 // PROSPERA DEFI PLATFORM Helper Functions
 import pxToRem from "assets/theme/functions/pxToRem";
 
-const { dark } = colors;
+const { pros } = colors;
 
 const baseProperties = {
   fontFamily: "Helvetica Monospaced, sans-serif",
@@ -45,13 +45,13 @@ const baseProperties = {
 };
 
 const baseHeadingProperties = {
-  color: dark.main,
+  color: pros.main,
   fontWeight: baseProperties.fontWeightBold,
 };
 
 const baseDisplayProperties = {
   fontFamily: baseProperties.fontFamily,
-  color: dark.main,
+  color: pros.main,
   fontWeight: baseProperties.fontWeightLight,
   lineHeight: 1.2,
 };

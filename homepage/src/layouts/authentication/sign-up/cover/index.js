@@ -13,7 +13,7 @@
 */
 
 // PROSPERA DEFI PLATFORM pages
-import SignUpCover from "pages/Authentication/SignUp/Cover";
+import SignUpCover from "pages/Authentication/SignUp/";
 
 export default function SignUpCoverPage() {
   return <SignUpCover />;
