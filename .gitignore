@@ -82,3 +82,6 @@ server/ecosystem.config.json
 # Temporary files
 *.tmp
 *.temp
+
+server/README.md
+README.md
