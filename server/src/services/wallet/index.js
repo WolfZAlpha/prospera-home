@@ -49,3 +49,28 @@ export const updateUserTokenBalance = async (userId) => {
   await user.save();
   return user;
 };
+
+export const checkTokenHolding = async (arbitrumWallet) => {
+  const balance = await getTokenBalance(arbitrumWallet);
+  const minBalance = process.env.MIN_TOKEN_BALANCE || 5000;
+  return Number(balance) >= Number(minBalance);
+};
+
+export const requestWhitelist = async (userId, arbitrumWallet) => {
+  const user = await userModel.findById(userId);
+  const holdsSufficientTokens = await checkTokenHolding(arbitrumWallet);
+
+  if (holdsSufficientTokens) {
+    user.whitelistStatus = "requested";
+    await user.save();
+    return {
+      success: true,
+      message: "Whitelist request submitted successfully.",
+    };
+  } else {
+    return {
+      success: false,
+      message: "Insufficient token balance for whitelist request.",
+    };
+  }
+};

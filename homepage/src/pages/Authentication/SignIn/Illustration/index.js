@@ -47,8 +47,10 @@ function SignIn() {
       console.error("Login error:", err);
       if (err.response) {
         console.error("Error response:", JSON.stringify(err.response.data, null, 2));
+        setError(err.response.data.message || "An error occurred during sign in");
+      } else {
+        setError(err.message || "An error occurred during sign in");
       }
-      setError(err.message || "An error occurred during sign in");
     }
   };
 

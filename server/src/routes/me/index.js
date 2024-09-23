@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import {
   getProfileRouteHandler,
   patchProfileRouteHandler,
-} from "../../services/me";
+} from "../../services/me/index.js";
 
 const router = express.Router();
 

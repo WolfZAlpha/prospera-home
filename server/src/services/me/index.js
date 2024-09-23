@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { roleModel } from "../../schemas/role.schema";
-import { permissionModel } from "../../schemas/permission.schema";
-import { userModel } from "../../schemas/user.schema";
+import { roleModel } from "../../schemas/role.schema.js";
+import { permissionModel } from "../../schemas/permission.schema.js";
+import { userModel } from "../../schemas/user.schema.js";
 
 export const getProfileRouteHandler = async (req, res) => {
   let fieldsUsers = [];

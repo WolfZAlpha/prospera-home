@@ -23,10 +23,13 @@ import AugmentedReality from "pages/AugmentedReality";
 import { AuthProvider } from "contexts/AuthContext";
 import { WalletProvider } from "contexts/WalletContext";
 import { BetaProvider } from "contexts/BetaContext";
+import PropTypes from "prop-types";
 
 export default function App() {
   const { pathname } = useLocation();
-  const isAugmentedRealitySubdomain = window.location.hostname === "ar.prosperadefi.com";
+  const isAugmentedRealitySubdomain =
+    window.location.hostname === "ar.prosperadefi.com" ||
+    (process.env.NODE_ENV === "development" && window.location.port === "3002");
 
   useEffect(() => {
     document.documentElement.scrollTop = 0;
@@ -54,13 +57,13 @@ export default function App() {
             <CssBaseline />
             {isAugmentedRealitySubdomain ? (
               <Routes>
-                <Route path="*" element={<AugmentedReality />} />
+                <Route path="/*" element={<AugmentedReality />} />
               </Routes>
             ) : (
               <Routes>
                 {getRoutes(routes)}
                 <Route path="/home" element={<Home />} />
-                <Route path="/pages/augmented-reality" element={<AugmentedReality />} />
+                <Route path="/pages/augmented-reality/*" element={<AugmentedReality />} />
                 <Route path="*" element={<Navigate to="/home" />} />
               </Routes>
             )}
@@ -70,3 +73,7 @@ export default function App() {
     </AuthProvider>
   );
 }
+
+App.propTypes = {
+  onInternalNavigation: PropTypes.func.isRequired,
+};

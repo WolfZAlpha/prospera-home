@@ -16,6 +16,12 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/logout", (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    domain: ".prosperadefi.com",
+  });
   return res.sendStatus(204);
 });
 
@@ -40,20 +46,9 @@ router.post("/password-reset", async (req, res) => {
   await resetPasswordRouteHandler(req, res);
 });
 
-// Add this new route
 router.get("/check", verifyAuth, async (req, res) => {
   try {
-    const user = req.user;
-    const fullAccessRoles = ["admin", "co-admin", "prosperaTeam", "kol"];
-    const hasFullAccess =
-      fullAccessRoles.includes(user.role) || user.isWhitelisted;
-
-    res.json({
-      user: {
-        ...user,
-        hasFullAccess,
-      },
-    });
+    await checkAuthRouteHandler(req, res);
   } catch (error) {
     console.error("Error in checkAuthRouteHandler:", error);
     res.status(500).json({ message: "Internal server error" });

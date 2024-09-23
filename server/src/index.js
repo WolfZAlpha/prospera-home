@@ -9,14 +9,17 @@ import { fileURLToPath } from "url";
 import routes from "./routes/index.js";
 import { dbConnect } from "./mongoose/index.js";
 import cron from "node-cron";
-import ReseedAction from "./mongoose/RessedAction.js";
 import { initializeChat } from "./services/chat/index.js";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import { errorHandler } from "./middleware/errorHandler.js";
+import { subdomainRouter } from "./middleware/subdomainRouter.js";
+import logger from "./utils/logger.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load environment variables from the root .env file
 dotenv.config({ path: path.join(__dirname, "..", "..", ".env") });
 
 const config = {
@@ -28,10 +31,6 @@ const config = {
     process.env.NODE_ENV === "development"
       ? process.env.APP_URL_CLIENT_DEV
       : process.env.APP_URL_CLIENT,
-  dashboardUrl:
-    process.env.NODE_ENV === "development"
-      ? process.env.APP_URL_DASHBOARD_DEV
-      : process.env.APP_URL_DASHBOARD,
   vrUrl:
     process.env.NODE_ENV === "development"
       ? process.env.APP_URL_VR_DEV
@@ -40,10 +39,10 @@ const config = {
     process.env.NODE_ENV === "development"
       ? process.env.APP_URL_API_DEV
       : process.env.APP_URL_API,
-  teamDashboardUrl:
-    process.env.NODE_ENV === "development"
-      ? process.env.APP_URL_TEAMDASHBOARD_DEV
-      : process.env.APP_URL_TEAMDASHBOARD,
+  arbiscanApiUrl: process.env.ARBISCAN_API_URL,
+  arbiscanApiKey: process.env.ARBISCAN_API_KEY,
+  prosTokenContract: process.env.PROS_TOKEN_CONTRACT,
+  minTokenBalance: process.env.MIN_TOKEN_BALANCE,
 };
 
 const app = express();
@@ -51,14 +50,8 @@ const server = http.createServer(app);
 
 const whitelist = [
   config.clientUrl,
-  config.dashboardUrl,
   config.vrUrl,
   config.apiUrl,
-  config.teamDashboardUrl,
-  "http://localhost:3000",
-  "http://localhost:3001",
-  "http://localhost:3002",
-  "http://localhost:3003",
 ];
 
 const corsOptions = {
@@ -75,10 +68,18 @@ const corsOptions = {
   exposedHeaders: ["set-cookie"],
 };
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 const startServer = async () => {
   try {
     await dbConnect();
 
+    app.use(helmet());
     app.use(cors(corsOptions));
     app.use(
       bodyParser.json({ type: "application/vnd.api+json", strict: false })
@@ -87,25 +88,25 @@ const startServer = async () => {
     app.use(express.urlencoded({ extended: true }));
     app.use(cookieParser());
     app.use(passport.initialize());
+    app.use(limiter);
+
+    app.use(subdomainRouter);
 
     app.get("/health", (req, res) => {
       res.status(200).json({ status: "OK", message: "Server is running" });
     });
 
+    // API routes
     app.use("/api", routes);
 
-    // Serve static files from the React app
+    // Serve static files for different parts of the application
     app.use(express.static(path.join(__dirname, "../../homepage/build")));
 
-    // Handle requests to the AR subdomain
-    app.use((req, res, next) => {
-      if (req.hostname === "ar.prosperadefi.com") {
-        req.url = "/augmented-reality";
-      }
-      next();
+    app.get(["/ar", "/ar/*"], (req, res) => {
+      res.sendFile(path.join(__dirname, "../../homepage/build/index.html"));
     });
 
-    // The "catchall" handler: for any request that doesn't match one above, send back React's index.html file.
+    // Serve React app for any unmatched routes
     app.get("*", (req, res) => {
       res.sendFile(path.join(__dirname, "../../homepage/build/index.html"));
     });
@@ -118,26 +119,44 @@ const startServer = async () => {
 
     initializeChat(server);
 
-    app.use((err, req, res, next) => {
-      console.error("Error:", err);
-      res.status(err.status || 500).json({
-        message: err.message || "Internal Server Error",
-        stack: config.isDev ? err.stack : "🥞",
-      });
-    });
+    app.use(errorHandler);
 
     server.listen(config.port, () => {
-      console.log(`Server listening on port ${config.port}`);
-      console.log("Environment:", process.env.NODE_ENV);
-      console.log("DB_LINK:", config.dbLink ? "Set" : "Not set");
-      console.log("APP_URL_CLIENT:", config.clientUrl);
-      console.log("CORS Whitelist:", whitelist);
-      console.log("API Base URL:", `${config.apiUrl}/api`);
+      logger.info(`Server listening on port ${config.port}`);
+      logger.info(`Environment: ${process.env.NODE_ENV}`);
+      logger.info(`DB_LINK: ${config.dbLink ? "Set" : "Not set"}`);
+      logger.info(`APP_URL_CLIENT: ${config.clientUrl}`);
+      logger.info(`APP_URL_VR: ${config.vrUrl}`);
+      logger.info(`CORS Whitelist: ${whitelist.join(", ")}`);
+      logger.info(`API Base URL: ${config.apiUrl}/api`);
+
+      // Log Arbiscan-related environment variables
+      logger.info(
+        `ARBISCAN_API_URL: ${config.arbiscanApiUrl ? "Set" : "Not set"}`
+      );
+      logger.info(
+        `ARBISCAN_API_KEY: ${config.arbiscanApiKey ? "Set" : "Not set"}`
+      );
+      logger.info(
+        `PROS_TOKEN_CONTRACT: ${config.prosTokenContract ? "Set" : "Not set"}`
+      );
+      logger.info(
+        `MIN_TOKEN_BALANCE: ${config.minTokenBalance ? "Set" : "Not set"}`
+      );
     });
   } catch (error) {
-    console.error("Failed to start the server:", error);
+    logger.error("Failed to start the server:", error);
     process.exit(1);
   }
 };
+
+// Graceful shutdown
+process.on("SIGTERM", () => {
+  logger.info("SIGTERM signal received. Closing HTTP server.");
+  server.close(() => {
+    logger.info("HTTP server closed.");
+    process.exit(0);
+  });
+});
 
 startServer();

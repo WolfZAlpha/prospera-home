@@ -3,7 +3,10 @@ import passport from "passport";
 import multer from "multer";
 import { fs } from "file-system";
 import { v4 as uuidv4 } from "uuid";
-import { setItemImage, setUserProfileImageRoute } from "../../services/uploads";
+import {
+  setItemImage,
+  setUserProfileImageRoute,
+} from "../../services/uploads/index.js";
 import jwt from "jsonwebtoken";
 import path from "path";
 

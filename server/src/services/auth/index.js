@@ -7,7 +7,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { SignJWT, jwtVerify, importPKCS8, importSPKI } from "jose";
 import { userModel } from "../../schemas/user.schema.js";
-import { roleModel } from "../../schemas/role.schema.js";
 import { passwordResetModel } from "../../schemas/passwordResets.schema.js";
 
 dotenv.config();
@@ -80,146 +79,138 @@ export async function verifyToken(token) {
 }
 
 export const loginRouteHandler = async (req, res) => {
-  console.log(
-    "Login handler. Request body:",
-    JSON.stringify(req.body, null, 2)
-  );
-  const { emailOrUsername, password } = req.body.data.attributes;
+  console.log("Login route hit. Request body:", req.body);
+  const { emailOrUsername, password, source } = req.body;
 
-  console.log("Attempting to find user with:", { emailOrUsername });
-
-  let foundUser = await userModel.findOne({
-    $or: [{ email: emailOrUsername }, { username: emailOrUsername }],
-  });
-
-  if (!foundUser) {
-    console.log("User not found");
+  if (typeof emailOrUsername !== "string" || typeof password !== "string") {
+    console.error("Invalid input types:", {
+      emailOrUsername: typeof emailOrUsername,
+      password: typeof password,
+    });
     return res.status(400).json({
-      errors: [{ detail: "Invalid credentials" }],
+      errors: [{ detail: "Invalid input" }],
     });
   }
 
-  console.log("User found:", JSON.stringify(foundUser, null, 2));
-  console.log("Stored hashed password:", foundUser.password);
-  console.log("Provided password:", password);
-
-  const validPassword = await foundUser.matchPassword(password);
-  console.log("Password valid:", validPassword);
-
-  if (!validPassword) {
-    console.log("Invalid password");
-    return res.status(400).json({
-      errors: [{ detail: "Invalid credentials" }],
+  try {
+    let foundUser = await userModel.findOne({
+      $or: [{ email: emailOrUsername }, { username: emailOrUsername }],
     });
-  }
 
-  console.log("Password valid, generating token");
+    if (!foundUser) {
+      console.log("User not found:", emailOrUsername);
+      return res.status(400).json({
+        errors: [{ detail: "Invalid credentials" }],
+      });
+    }
 
-  const token = await generateToken({
-    id: foundUser.id,
-    email: foundUser.email,
-    role: foundUser.role,
-  });
+    const validPassword = await foundUser.matchPassword(password);
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    domain: ".prosperadefi.com",
-    maxAge: 24 * 60 * 60 * 1000, // 1 day
-  });
+    if (!validPassword) {
+      console.log("Invalid password for user:", emailOrUsername);
+      return res.status(400).json({
+        errors: [{ detail: "Invalid credentials" }],
+      });
+    }
 
-  return res.json({
-    message: "Logged in successfully",
-    user: {
+    if (
+      source === "team-dashboard" &&
+      !["admin", "co-admin", "prosperaTeam", "kol"].includes(foundUser.role)
+    ) {
+      console.log(
+        "Unauthorized access attempt to team dashboard:",
+        emailOrUsername,
+        foundUser.role
+      );
+      return res.status(403).json({
+        errors: [
+          { detail: "You do not have permission to access this dashboard." },
+        ],
+      });
+    }
+
+    const token = await generateToken({
       id: foundUser.id,
-      name: foundUser.name,
       email: foundUser.email,
-      username: foundUser.username,
       role: foundUser.role,
-      arbitrumWallet: foundUser.arbitrumWallet,
-    },
-  });
-};
+    });
 
-export const logoutRouteHandler = (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    domain: ".prosperadefi.com",
-  });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      domain: ".prosperadefi.com",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
 
-  res.json({ message: "Logged out successfully" });
+    console.log("Login successful:", emailOrUsername);
+
+    return res.json({
+      message: "Logged in successfully",
+      user: {
+        id: foundUser.id,
+        name: foundUser.name,
+        email: foundUser.email,
+        username: foundUser.username,
+        role: foundUser.role,
+        arbitrumWallet: foundUser.arbitrumWallet,
+        betaAccess: foundUser.betaAccess,
+        whitelistStatus: foundUser.whitelistStatus,
+        isWhitelisted: foundUser.isWhitelisted,
+        profile_image: foundUser.profile_image || "",
+      },
+      token: token,
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    return res.status(500).json({
+      errors: [{ detail: "An error occurred during login" }],
+    });
+  }
 };
 
 export const registerRouteHandler = async (req, res) => {
   try {
-    console.log(
-      "Registration attempt. Request body:",
-      JSON.stringify(req.body, null, 2)
-    );
     const { name, email, password, arbitrumWallet, username } =
       req.body.data.attributes;
 
-    console.log("Checking for existing user with email:", email);
     let foundUser = await userModel.findOne({ email: email });
     if (foundUser) {
-      console.log("User with this email already exists");
       return res.status(400).json({ message: "The email is already in use" });
     }
 
-    console.log(
-      "Checking for existing user with Arbitrum wallet:",
-      arbitrumWallet
-    );
     foundUser = await userModel.findOne({ arbitrumWallet: arbitrumWallet });
     if (foundUser) {
-      console.log("User with this Arbitrum wallet already exists");
       return res
         .status(400)
         .json({ message: "The Arbitrum wallet is already in use" });
     }
 
     if (!password || password.length < 8) {
-      console.log("Password is too short");
       return res
         .status(400)
         .json({ message: "The password must be at least 8 characters long." });
     }
 
-    console.log("Finding member role");
-    let memberRole = await roleModel.findOne({ name: "member" });
-    if (!memberRole) {
-      console.error("Member role not found");
-      return res.status(500).json({ message: "Error setting user role" });
-    }
-
-    console.log("Creating new user");
     const newUser = new userModel({
       username,
       name,
       email,
-      password, // Using the plain password here
+      password,
       arbitrumWallet,
-      role: memberRole.name,
+      role: "member",
+      betaAccess: false,
+      whitelistStatus: "none",
     });
 
-    console.log("New user object:", JSON.stringify(newUser, null, 2));
-
-    console.log("Saving new user to database");
     await newUser.save();
 
-    console.log("User saved. Hashed password:", newUser.password);
-
-    console.log("Generating token for new user");
     const token = await generateToken({
       id: newUser.id,
       email: newUser.email,
       role: newUser.role,
     });
 
-    console.log("Registration successful");
     return res.status(200).json({
       message: "Registered successfully",
       user: {
@@ -228,6 +219,8 @@ export const registerRouteHandler = async (req, res) => {
         email: newUser.email,
         role: newUser.role,
         arbitrumWallet: newUser.arbitrumWallet,
+        betaAccess: newUser.betaAccess,
+        whitelistStatus: newUser.whitelistStatus,
       },
       token: token,
     });
@@ -236,7 +229,6 @@ export const registerRouteHandler = async (req, res) => {
     return res.status(500).json({
       message: "An error occurred during registration",
       error: error.message,
-      stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
     });
   }
 };
@@ -285,9 +277,7 @@ export const resetPasswordRouteHandler = async (req, res) => {
 
   if (password.length < 8) {
     return res.status(400).json({
-      errors: {
-        password: ["The password should have at least 8 characters."],
-      },
+      errors: { password: ["The password should have at least 8 characters."] },
     });
   }
 
@@ -335,16 +325,29 @@ export const verifyAuth = async (req, res, next) => {
 
 export const checkAuthRouteHandler = async (req, res) => {
   try {
-    // At this point, the user is already authenticated due to the verifyAuth middleware
     const user = req.user;
-    const fullAccessRoles = ["admin", "co-admin", "prosperaTeam", "kol"];
-    const hasFullAccess =
-      fullAccessRoles.includes(user.role) || user.isWhitelisted;
+    const fullUser = await userModel.findById(user.id).select("-password");
+    const { source } = req.query;
+
+    if (
+      source === "team-dashboard" &&
+      !["admin", "co-admin", "prosperaTeam", "kol"].includes(fullUser.role)
+    ) {
+      return res.status(403).json({
+        message: "You do not have permission to access the team dashboard.",
+      });
+    }
+
+    if (source === "user-dashboard" && !fullUser.betaAccess) {
+      return res
+        .status(403)
+        .json({ message: "You do not have access to the user dashboard yet." });
+    }
 
     res.json({
       user: {
-        ...user,
-        hasFullAccess,
+        ...fullUser.toObject(),
+        hasFullAccess: fullUser.hasFullAccess(),
       },
     });
   } catch (error) {

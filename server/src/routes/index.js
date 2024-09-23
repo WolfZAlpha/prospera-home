@@ -1,16 +1,11 @@
 import express from "express";
-import userRoutes from "./users/index.js";
-import authRoutes from "./auth/index.js";
-import roleRoutes from "./roles/index.js";
-import settingsRoutes from "./settings/index.js";
-import productRoutes from "./products/index.js";
+import v1Routes from "./v1/index.js";
+import v2Routes from "./v2/index.js";
+import { authenticate } from "../middleware/authMiddleware/index.js";
 
 const router = express.Router();
 
-router.use("/auth", authRoutes);
-router.use("/users", userRoutes);
-router.use("/roles", roleRoutes);
-router.use("/settings", settingsRoutes);
-router.use("/products", productRoutes);
+router.use("/v1", v1Routes);
+router.use("/v2", authenticate, v2Routes);
 
 export default router;

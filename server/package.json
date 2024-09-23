@@ -10,9 +10,12 @@
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
+    "ethers": "^5.7.2",
     "express": "^4.18.2",
+    "express-rate-limit": "^7.4.0",
     "file-system": "^2.2.2",
     "form-data": "^4.0.0",
+    "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.4",
     "multer": "^1.4.5-lts.1",
@@ -25,7 +28,8 @@
     "pg": "^8.11.3",
     "sequelize": "^6.32.1",
     "socket.io": "^4.7.5",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "winston": "^3.14.2"
   },
   "devDependencies": {
     "nodemon": "^3.0.1",
@@ -36,7 +40,9 @@
     "start:dev": "nodemon src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "seed": "node src/mongoose/seedData.js",
-    "clear": "node src/mongoose/clearDbs.js"
+    "clear": "node src/mongoose/clearDbs.js",
+    "reseed": "node -r dotenv/config src/mongoose/RessedAction.js",
+    "reseed:prod": "node -e \"console.log('Are you sure you want to reseed the production database? Type YES to confirm:'); process.stdin.once('data', (data) => { if (data.toString().trim() === 'YES') { require('./src/mongoose/RessedAction.js'); } else { console.log('Reseeding cancelled.'); } });\""
   },
   "engines": {
     "node": ">=18"

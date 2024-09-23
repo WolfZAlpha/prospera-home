@@ -8,7 +8,7 @@ import {
   deleteItemRoute,
   getCategoryOfItemRoute,
   getTagsOfItemRoute,
-} from "../../services/items";
+} from "../../services/items/index.js";
 import jwt from "jsonwebtoken";
 const router = express.Router();
 

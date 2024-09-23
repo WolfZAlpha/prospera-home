@@ -1,4 +1,4 @@
-import { categoryModel } from "../../schemas/category.schema";
+import { categoryModel } from "../../schemas/category.schema.js";
 
 export const getCategoriesRoute = async (req, res) => {
   let categoriesObjectArray = [];

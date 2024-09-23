@@ -1,4 +1,4 @@
-import { permissionModel } from "../../schemas/permission.schema";
+import { permissionModel } from "../../schemas/permission.schema.js";
 
 export const getPermissionsRoute = async (req, res) => {
   let permissionsObjectArray = [];

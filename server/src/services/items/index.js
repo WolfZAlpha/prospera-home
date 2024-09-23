@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
-import { itemModel } from "../../schemas/item.schema";
-import { categoryModel } from "../../schemas/category.schema";
-import { tagModel } from "../../schemas/tag.schema";
+import { itemModel } from "../../schemas/item.schema.js";
+import { categoryModel } from "../../schemas/category.schema.js";
+import { tagModel } from "../../schemas/tag.schema.js";
 
 dotenv.config();
 

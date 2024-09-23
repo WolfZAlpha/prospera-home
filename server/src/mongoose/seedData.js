@@ -3,16 +3,16 @@ import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
 import { roleModel } from "../schemas/role.schema.js";
 import { permissionModel } from "../schemas/permission.schema.js";
+import { userModel } from "../schemas/user.schema.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load environment variables from the root .env file
 const envPath = path.join(__dirname, "..", "..", "..", ".env");
-console.log("Attempting to load .env file from:", envPath);
 console.log("Attempting to load .env file from:", envPath);
 
 if (fs.existsSync(envPath)) {
@@ -36,7 +36,6 @@ async function dbConnect() {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       ssl: true,
-      tlsAllowInvalidCertificates: true,
     });
     console.log("MongoDB connection established successfully");
   } catch (error) {
@@ -47,7 +46,6 @@ async function dbConnect() {
 
 async function seedDB() {
   try {
-    // Connect to db
     await dbConnect();
 
     console.log("Connected to database. Starting seeding process...");
@@ -78,12 +76,11 @@ async function seedDB() {
     ];
 
     console.log("Creating permissions...");
-    // Create permissions
     const createdPermissions = await Promise.all(
       permissions.map((name) =>
         permissionModel.findOneAndUpdate(
           { name },
-          { name, created_at: new Date(), updated_at: new Date() },
+          { name, createdAt: new Date(), updatedAt: new Date() },
           { upsert: true, new: true }
         )
       )
@@ -114,7 +111,6 @@ async function seedDB() {
     };
 
     console.log("Creating roles...");
-    // Create or update roles
     const createdRoles = await Promise.all(
       Object.entries(rolePermissions).map(([roleName, permissions]) =>
         roleModel.findOneAndUpdate(
@@ -122,8 +118,8 @@ async function seedDB() {
           {
             name: roleName,
             permissions: permissions,
-            created_at: new Date(),
-            updated_at: new Date(),
+            createdAt: new Date(),
+            updatedAt: new Date(),
           },
           { upsert: true, new: true }
         )
@@ -132,17 +128,39 @@ async function seedDB() {
 
     console.log(`Created ${createdRoles.length} roles.`);
 
+    // Create admin user
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, salt);
+
+    const adminUser = await userModel.findOneAndUpdate(
+      { email: process.env.ADMIN_EMAIL },
+      {
+        name: "Zed Wolf",
+        username: "unknownZ",
+        email: process.env.ADMIN_EMAIL,
+        password: hashedPassword,
+        role: "admin",
+        arbitrumWallet: process.env.ADMIN_WALLET,
+        betaAccess: true,
+        whitelistStatus: "approved",
+        isWhitelisted: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      { upsert: true, new: true }
+    );
+
+    console.log("Admin user created or updated.");
+
     console.log("Seeding process completed successfully.");
   } catch (error) {
     console.error("An error occurred during the seeding process:", error);
   } finally {
-    // Close the database connection
     await mongoose.connection.close();
     console.log("Database connection closed.");
   }
 }
 
-// Run the seeding function
 seedDB()
   .then(() => {
     console.log("Seeding script finished execution.");

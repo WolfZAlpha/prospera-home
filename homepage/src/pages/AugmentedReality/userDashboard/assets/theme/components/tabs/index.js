@@ -1,0 +1,62 @@
+/** 
+=========================================================
+* PROSPERA DEFI USER DASHBOARD - v1.0.0
+=========================================================
+
+* Copyright 2024 PROSPERA DEFI (https://www.prosperadefi.com/)
+
+* Design and Coded by Z
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the PROSPERA DEFI PLATFORM.
+*/
+
+// prospera defi dashboard base styles
+import colors from "../../../../assets/theme/base/colors";
+import borders from "../../../../assets/theme/base/borders";
+import boxShadows from "../../../../assets/theme/base/boxShadows";
+
+// prospera defi dashboard helper functions
+import pxToRem from "../../../../assets/theme/functions/pxToRem";
+
+const { grey, info, transparent } = colors;
+const { borderRadius } = borders;
+const { tabsBoxShadow } = boxShadows;
+
+export default {
+  styleOverrides: {
+    root: {
+      minWidth: "fit-content !important",
+      position: "relative",
+      background: transparent.main,
+      borderRadius: borderRadius.md,
+      minHeight: "unset",
+      padding: pxToRem(4),
+    },
+
+    flexContainer: {
+      height: "100%",
+      position: "relative",
+      zIndex: 10,
+    },
+
+    fixed: {
+      overflow: "unset !important",
+      overflowX: "unset !important",
+    },
+
+    vertical: {
+      "& .MuiTabs-indicator": {
+        width: "100%",
+      },
+    },
+
+    indicator: {
+      height: "100%",
+      borderRadius: borderRadius.lg,
+      backgroundColor: info.main,
+      transition: "all 500ms ease",
+    },
+  },
+};

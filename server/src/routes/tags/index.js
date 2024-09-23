@@ -6,7 +6,7 @@ import {
   editTagRoute,
   getTagRoute,
   getTagsRoute,
-} from "../../services/tags";
+} from "../../services/tags/index.js";
 import jwt from "jsonwebtoken";
 const router = express.Router();
 

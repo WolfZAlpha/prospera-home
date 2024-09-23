@@ -1,8 +1,8 @@
 import { verifyToken } from "../../services/auth/index.js";
 import { userModel } from "../../schemas/user.schema.js";
 
-export const protect = async (req, res, next) => {
-  let token = req.cookies.token;
+export const authenticate = async (req, res, next) => {
+  let token = req.cookies.token || req.headers.authorization?.split(" ")[1];
 
   if (!token) {
     return res.status(401).json({ message: "Not authorized, no token" });
@@ -13,10 +13,7 @@ export const protect = async (req, res, next) => {
     if (!payload) {
       return res.status(401).json({ message: "Not authorized, token failed" });
     }
-    req.user = await userModel
-      .findById(payload.id)
-      .select("-password")
-      .populate("role");
+    req.user = await userModel.findById(payload.id).select("-password");
     next();
   } catch (error) {
     console.error("Token verification error:", error);
@@ -26,11 +23,18 @@ export const protect = async (req, res, next) => {
 
 export const authorize = (...roles) => {
   return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role.name)) {
+    if (!req.user || !roles.includes(req.user.role)) {
       return res
         .status(403)
         .json({ message: "Not authorized to access this route" });
     }
     next();
   };
+};
+
+export const betaAccess = (req, res, next) => {
+  if (!req.user.betaAccess && !req.user.hasFullAccess()) {
+    return res.status(403).json({ message: "Beta access required" });
+  }
+  next();
 };

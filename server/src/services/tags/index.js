@@ -1,4 +1,4 @@
-import { tagModel } from "../../schemas/tag.schema";
+import { tagModel } from "../../schemas/tag.schema.js";
 
 export const getTagsRoute = async (req, res) => {
   let tagsObjectArray = [];

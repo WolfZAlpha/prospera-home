@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
-import { itemModel } from "../../schemas/item.schema";
-import { userModel } from "../../schemas/user.schema";
+import { itemModel } from "../../schemas/item.schema.js";
+import { userModel } from "../../schemas/user.schema.js";
 
 dotenv.config();
 

@@ -1,28 +1,14 @@
 import React, { useState, useContext, useCallback, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
-// @mui material components
-import Card from "@mui/material/Card";
-import Grid from "@mui/material/Grid";
-import Checkbox from "@mui/material/Checkbox";
-
-// PROSPERA DEFI PLATFORM components
+import { Card, Grid, Checkbox } from "@mui/material";
 import MKBox from "components/MKBox";
 import MKTypography from "components/MKTypography";
 import MKInput from "components/MKInput";
 import MKButton from "components/MKButton";
-
-// Authentication layout components
 import CoverLayout from "./layout";
-
-// Contexts
 import { AuthContext } from "contexts/AuthContext";
 import { BetaContext } from "contexts/BetaContext";
-
-// Services
-import { getTokenBalance, checkTokenHolding } from "services/tokenService";
-
-// MatrixRain background
+import { getTokenBalance, checkTokenHolding } from "services/api";
 import MatrixRain from "./background";
 
 function Cover() {

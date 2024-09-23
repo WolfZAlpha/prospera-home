@@ -4,30 +4,24 @@
   "private": true,
   "workspaces": [
     "homepage",
-    "server",
-    "team-dashboard"
+    "server"
   ],
   "scripts": {
     "start": "NODE_ENV=production node server/src/index.js",
-    "start:dev": "NODE_ENV=development concurrently \"npm run start:server\" \"npm run start:homepage\" \"npm run start:team-dashboard\"",
+    "start:dev": "NODE_ENV=development concurrently \"npm run start:server\" \"npm run start:homepage\"",
     "start:server": "cd server && npm run start:dev",
     "start:homepage": "cd homepage && npm start",
-    "start:team-dashboard": "cd team-dashboard && npm start",
-    "build": "npm run build:homepage && npm run build:team-dashboard",
+    "build": "npm run build:homepage",
     "build:homepage": "cd homepage && npm run build",
-    "build:team-dashboard": "cd team-dashboard && npm run build",
-    "install:all": "npm install && npm run install:homepage && npm run install:server && npm run install:team-dashboard",
+    "install:all": "npm install && npm run install:homepage && npm run install:server",
     "install:homepage": "cd homepage && npm install",
     "install:server": "cd server && npm install",
-    "install:team-dashboard": "cd team-dashboard && npm install",
-    "lint": "npm run lint:homepage && npm run lint:server && npm run lint:team-dashboard",
+    "lint": "npm run lint:homepage && npm run lint:server",
     "lint:homepage": "cd homepage && npm run lint",
     "lint:server": "cd server && eslint .",
-    "lint:team-dashboard": "cd team-dashboard && npm run lint",
-    "prettify": "npm run prettify:homepage && npm run prettify:server && npm run prettify:team-dashboard",
+    "prettify": "npm run prettify:homepage && npm run prettify:server",
     "prettify:homepage": "cd homepage && npm run prettify",
     "prettify:server": "cd server && prettier --write .",
-    "prettify:team-dashboard": "cd team-dashboard && prettier --write .",
     "deploy": "npm run build && NODE_ENV=production node server/src/index.js"
   },
   "engines": {

@@ -1,8 +1,9 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import PropTypes from "prop-types";
-import { checkTokenHolding, getTokenBalance } from "../../services/tokenService";
+import { checkTokenHolding, getTokenBalance } from "../../services/api";
 import { AuthContext } from "../AuthContext";
 import axios from "axios";
+import config from "../../config";
 
 export const BetaContext = createContext();
 
@@ -22,9 +23,9 @@ export const BetaProvider = ({ children }) => {
 
   const checkWhitelistStatus = async () => {
     try {
-      const response = await axios.get(`/api/users/${user.id}/whitelist-status`);
+      const response = await axios.get(`${config.apiUrl}/api/v1/users/${user.id}/whitelist-status`);
       setIsWhitelisted(response.data.isWhitelisted);
-      setHasRequestedWhitelist(response.data.hasRequestedWhitelist);
+      setHasRequestedWhitelist(response.data.whitelistStatus === "requested");
     } catch (error) {
       console.error("Error checking whitelist status:", error);
     }
@@ -35,13 +36,34 @@ export const BetaProvider = ({ children }) => {
     setHasFullAccess(fullAccessRoles.includes(user.role) || isWhitelisted);
   };
 
+  const hasAccessToFeature = (feature) => {
+    const fullAccessRoles = ["admin", "co-admin", "prosperaTeam", "kol"];
+    if (fullAccessRoles.includes(user.role)) {
+      return true;
+    }
+
+    switch (feature) {
+      case "augmentedReality":
+        return !isBetaMode || isWhitelisted || user.betaAccess;
+      case "teamDashboard":
+        return ["admin", "co-admin", "prosperaTeam", "kol"].includes(user.role);
+      case "userDashboard":
+        return !isBetaMode || isWhitelisted || user.betaAccess;
+      default:
+        return false;
+    }
+  };
+
   const requestWhitelist = async (arbitrumWallet) => {
     try {
       const holdsSufficientPROS = await checkTokenHolding(arbitrumWallet);
       if (holdsSufficientPROS) {
-        const response = await axios.post(`/api/users/${user.id}/request-whitelist`, {
-          arbitrumWallet,
-        });
+        const response = await axios.post(
+          `${config.apiUrl}/api/v1/users/${user.id}/request-whitelist`,
+          {
+            arbitrumWallet,
+          }
+        );
         setHasRequestedWhitelist(true);
         alert(response.data.message);
       } else {
@@ -58,7 +80,7 @@ export const BetaProvider = ({ children }) => {
 
   const toggleBetaMode = async (value) => {
     try {
-      await axios.post("/api/admin/toggle-beta-mode", { isBetaMode: value });
+      await axios.post(`${config.apiUrl}/api/v1/admin/toggle-beta-mode`, { isBetaMode: value });
       setIsBetaMode(value);
     } catch (error) {
       console.error("Error toggling beta mode:", error);
@@ -75,6 +97,7 @@ export const BetaProvider = ({ children }) => {
         hasFullAccess,
         requestWhitelist,
         toggleBetaMode,
+        hasAccessToFeature,
       }}
     >
       {children}
@@ -85,3 +108,5 @@ export const BetaProvider = ({ children }) => {
 BetaProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
+
+export default BetaProvider;

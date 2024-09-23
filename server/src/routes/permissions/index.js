@@ -1,6 +1,6 @@
 import express from "express";
 import passport from "passport";
-import { getPermissionsRoute } from "../../services/permissions";
+import { getPermissionsRoute } from "../../services/permissions/index.js";
 import jwt from "jsonwebtoken";
 const router = express.Router();
 

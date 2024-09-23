@@ -8,11 +8,7 @@ dotenv.config();
 
 const validateEmail = (inputText) => {
   var mailformat = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (inputText.match(mailformat)) {
-    return true;
-  } else {
-    return false;
-  }
+  return inputText.match(mailformat);
 };
 
 export const getUsersRoute = async (req, res) => {
@@ -25,7 +21,6 @@ export const getUsersRoute = async (req, res) => {
     options = req.query.include.split(",");
   }
 
-  // pagination
   let paginationSize = null;
   let pageNumber = null;
   if (req.query.page) {
@@ -37,19 +32,16 @@ export const getUsersRoute = async (req, res) => {
     }
   }
 
-  // filtering
   let filters = {};
   if (req.query.filter) {
     filters = req.query.filter;
   }
 
-  //sorting
   let sortValue;
   if (req.query.sort) {
     sortValue = req.query.sort;
   }
 
-  // choose fields
   let fieldsUser;
   let fieldsRole;
   let fieldsPerms;
@@ -174,18 +166,13 @@ export const getUserRoute = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const role = await roleModel
-      .findOne({ _id: user.role })
-      .populate("permissions")
-      .select(fieldsRole);
+    const role = user.role;
 
     let userPermissions = await permissionModel
       .find({ _id: { $in: role.permissions } })
       .select(fieldsPerms);
 
-    const hasFullAccess =
-      ["admin", "co-admin", "prosperaTeam", "kol"].includes(role.name) ||
-      user.isWhitelisted;
+    const hasFullAccess = user.hasFullAccess();
 
     if (fieldsRole) {
       fieldObj = {
@@ -200,7 +187,8 @@ export const getUserRoute = async (req, res) => {
       type: "users",
       id: userId,
       attributes: {
-        ...user._doc,
+        ...user.toObject(),
+        role: role.name, // Use the role name instead of the ID
         roleName: role.name,
         isWhitelisted: user.isWhitelisted,
         hasFullAccess: hasFullAccess,
@@ -227,7 +215,7 @@ export const getUserRoute = async (req, res) => {
           type: "roles",
           id: role.id,
           attributes: {
-            ...role._doc,
+            ...role.toObject(),
           },
         };
       }
@@ -239,7 +227,7 @@ export const getUserRoute = async (req, res) => {
             id: element.id,
             attributes: {
               name: element.name,
-              ...element._doc,
+              ...element.toObject(),
             },
           };
           return (jsonArray = { ...jsonArray, ...jsonObj });
@@ -297,7 +285,6 @@ export const createUserRoute = async (req, res) => {
       .json({ message: "The email has already been taken" });
   }
 
-  // check password to exist and be at least 8 characters long
   if (!password || password.length < 8) {
     return res
       .status(400)
@@ -309,7 +296,6 @@ export const createUserRoute = async (req, res) => {
       .json({ message: "Password and password confirmation must match" });
   }
 
-  // hash password to save in db
   const salt = await bcrypt.genSalt(10);
   const hashPassword = await bcrypt.hash(password, salt);
 
@@ -322,6 +308,8 @@ export const createUserRoute = async (req, res) => {
     created_at: Date.now(),
     updated_at: Date.now(),
     role: roleId,
+    betaAccess: false,
+    whitelistStatus: "none",
   });
   await newUser.save();
 
@@ -353,7 +341,8 @@ export const createUserRoute = async (req, res) => {
 export const editUserRoute = async (req, res) => {
   const foundUser = await userModel.findById(req.params.id);
 
-  const { name, email, profile_image } = req.body.data.attributes;
+  const { name, email, profile_image, betaAccess, whitelistStatus } =
+    req.body.data.attributes;
   let roleId;
   let oldRole = await roleModel.findOne({ _id: foundUser.role });
   if (req.body.data.relationships) {
@@ -373,19 +362,25 @@ export const editUserRoute = async (req, res) => {
       .json({ errors: [{ detail: "The email has already been taken" }] });
   }
 
-  const updatedUser = await userModel.updateOne(
+  const updatedUser = await userModel.findOneAndUpdate(
     { _id: foundUser._id },
-    { name: name, email: email, profile_image: profile_image, role: roleId }
+    {
+      name: name,
+      email: email,
+      profile_image: profile_image,
+      role: roleId,
+      betaAccess: betaAccess,
+      whitelistStatus: whitelistStatus,
+      updated_at: Date.now(),
+    },
+    { new: true }
   );
 
   if (oldRole._id != roleId) {
-    // the role was changed
-    // remove the user from the oldRole
     const results = oldRole.users.filter(
       (value) => !value.equals(foundUser._id)
     );
     await roleModel.updateOne({ _id: oldRole._id }, { users: [...results] });
-    // update new role with users
     const newRole = await roleModel.findById(roleId);
     await roleModel.updateOne(
       { _id: roleId },
@@ -394,17 +389,18 @@ export const editUserRoute = async (req, res) => {
   }
 
   const sentData = {
-    data: "users",
-    id: foundUser.id,
-    attributes: {
-      ...updatedUser._doc,
+    data: {
+      type: "users",
+      id: updatedUser.id,
+      attributes: {
+        ...updatedUser._doc,
+      },
     },
   };
   return res.status(200).send(sentData);
 };
 
 export const deleteUserRoute = async (req, res) => {
-  // here should be verification if demo and other stuff?
   const toDeleteUser = await userModel.findById(req.params.id);
 
   if (!toDeleteUser) {
@@ -422,6 +418,53 @@ export const deleteUserRoute = async (req, res) => {
       res.sendStatus(204);
     } catch (err) {
       console.error(err);
+      res.status(500).send({
+        errors: [{ detail: "An error occurred while deleting the user" }],
+      });
     }
+  }
+};
+
+export const updateBetaAccess = async (userId, betaAccess) => {
+  try {
+    const user = await userModel.findByIdAndUpdate(
+      userId,
+      { betaAccess: betaAccess },
+      { new: true }
+    );
+    return user;
+  } catch (error) {
+    console.error("Error updating beta access:", error);
+    throw error;
+  }
+};
+
+export const updateWhitelistStatus = async (userId, status) => {
+  try {
+    const user = await userModel.findByIdAndUpdate(
+      userId,
+      { whitelistStatus: status },
+      { new: true }
+    );
+    return user;
+  } catch (error) {
+    console.error("Error updating whitelist status:", error);
+    throw error;
+  }
+};
+
+export const getWhitelistStatus = async (userId) => {
+  try {
+    const user = await userModel
+      .findById(userId)
+      .select("isWhitelisted whitelistStatus betaAccess");
+    return {
+      isWhitelisted: user.isWhitelisted,
+      whitelistStatus: user.whitelistStatus,
+      betaAccess: user.betaAccess,
+    };
+  } catch (error) {
+    console.error("Error getting whitelist status:", error);
+    throw error;
   }
 };

@@ -70,17 +70,19 @@ export const AuthProvider = ({ children }) => {
   const login = async (emailOrUsername, password) => {
     try {
       console.log("Login attempt. Payload:", { emailOrUsername, password: "REDACTED" });
+      console.log("API URL being used:", `${API_URL}/api/v1/auth/login`);
       const response = await axios.post(
-        `${API_URL}/api/auth/login`,
+        `${API_URL}/api/v1/auth/login`,
         {
-          data: {
-            attributes: {
-              emailOrUsername,
-              password,
-            },
-          },
+          emailOrUsername,
+          password,
         },
-        { withCredentials: true }
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
       console.log("Login response:", JSON.stringify(response.data, null, 2));
       const { user: userData, token } = response.data;
@@ -102,7 +104,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       const response = await axios.post(
-        `${API_URL}/api/auth/register`,
+        `${API_URL}/api/v1/auth/register`,
         {
           data: {
             attributes: userData,
@@ -134,7 +136,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post(`${API_URL}/api/auth/logout`, {}, { withCredentials: true });
+      await axios.post(`${API_URL}/api/v1/auth/logout`, {}, { withCredentials: true });
       setUser(null);
       setAuthToken(null);
       localStorage.removeItem("user");

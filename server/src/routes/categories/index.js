@@ -6,7 +6,7 @@ import {
   editCategoryRoute,
   getCategoriesRoute,
   getCategoryRoute,
-} from "../../services/categories";
+} from "../../services/categories/index.js";
 import jwt from "jsonwebtoken";
 const router = express.Router();
 

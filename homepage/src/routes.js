@@ -88,11 +88,13 @@ const routes = [
         ],
       },
       {
-        name: "apps",
+        name: "Augmented Reality",
+        key: "augmented-reality",
         collapse: [
           {
-            name: "augmented reality",
-            route: "/augmented-reality",
+            name: "Augmented Reality",
+            key: "augmented-reality",
+            route: "/augmented-reality/*",
             component: <AugmentedRealityPage />,
           },
         ],
