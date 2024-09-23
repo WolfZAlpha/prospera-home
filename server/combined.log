@@ -2201,3 +2201,19 @@
 {"level":"info","message":"ARBISCAN_API_KEY: Set","timestamp":"2024-09-23T18:12:44.332Z"}
 {"level":"info","message":"PROS_TOKEN_CONTRACT: Set","timestamp":"2024-09-23T18:12:44.332Z"}
 {"level":"info","message":"MIN_TOKEN_BALANCE: Set","timestamp":"2024-09-23T18:12:44.332Z"}
+{"level":"info","message":"TokenService - Environment variables:","timestamp":"2024-09-23T19:41:13.635Z"}
+{"level":"info","message":"ARBISCAN_API_URL: Set","timestamp":"2024-09-23T19:41:13.637Z"}
+{"level":"info","message":"ARBISCAN_API_KEY: Set","timestamp":"2024-09-23T19:41:13.637Z"}
+{"level":"info","message":"PROS_TOKEN_CONTRACT: Set","timestamp":"2024-09-23T19:41:13.637Z"}
+{"level":"info","message":"MIN_TOKEN_BALANCE: Set","timestamp":"2024-09-23T19:41:13.637Z"}
+{"level":"info","message":"Server listening on port 8080","timestamp":"2024-09-23T19:41:14.548Z"}
+{"level":"info","message":"Environment: development","timestamp":"2024-09-23T19:41:14.548Z"}
+{"level":"info","message":"DB_LINK: Set","timestamp":"2024-09-23T19:41:14.548Z"}
+{"level":"info","message":"APP_URL_CLIENT: http://localhost:3000","timestamp":"2024-09-23T19:41:14.548Z"}
+{"level":"info","message":"APP_URL_VR: undefined","timestamp":"2024-09-23T19:41:14.548Z"}
+{"level":"info","message":"CORS Whitelist: http://localhost:3000, , http://localhost:8080","timestamp":"2024-09-23T19:41:14.548Z"}
+{"level":"info","message":"API Base URL: http://localhost:8080/api","timestamp":"2024-09-23T19:41:14.548Z"}
+{"level":"info","message":"ARBISCAN_API_URL: Set","timestamp":"2024-09-23T19:41:14.548Z"}
+{"level":"info","message":"ARBISCAN_API_KEY: Set","timestamp":"2024-09-23T19:41:14.549Z"}
+{"level":"info","message":"PROS_TOKEN_CONTRACT: Set","timestamp":"2024-09-23T19:41:14.549Z"}
+{"level":"info","message":"MIN_TOKEN_BALANCE: Set","timestamp":"2024-09-23T19:41:14.549Z"}

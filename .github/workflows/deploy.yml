@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# Set variables
+DEPLOY_DIR="/var/www/prosperadefi"
+LOG_FILE="/var/log/prospera_deploy.log"
+
+# Function to log messages
+log_message() {
+    echo "$(date): $1" | tee -a "$LOG_FILE"
+}
+
+# Navigate to the project directory
+cd "$DEPLOY_DIR" || exit
+
+# Backup .env files
+log_message "Backing up .env files..."
+cp .env .env.bak
+cp homepage/.env homepage/.env.bak
+cp server/.env server/.env.bak
+
+# Pull the latest changes
+log_message "Pulling latest changes from the repository..."
+git pull origin main
+
+# Restore .env files
+log_message "Restoring .env files..."
+mv .env.bak .env
+mv homepage/.env.bak homepage/.env
+mv server/.env.bak server/.env
+
+# Install dependencies
+log_message "Installing dependencies..."
+npm ci
+cd homepage && npm ci
+cd ../server && npm ci
+
+# Build the frontend
+log_message "Building the frontend..."
+cd "$DEPLOY_DIR/homepage" && npm run build
+
+# Update PM2 configuration
+log_message "Updating PM2 configuration..."
+cp server/ecosystem.config.json .
+
+# Restart the application using PM2
+log_message "Restarting the application..."
+pm2 restart ecosystem.config.json
+
+log_message "Deployment completed successfully!"
