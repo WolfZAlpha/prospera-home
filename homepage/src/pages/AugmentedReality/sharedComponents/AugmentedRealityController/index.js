@@ -1,23 +1,9 @@
-/** 
-=========================================================
-* PROSPERA DEFI DASHBOARD - v1.0.0
-=========================================================
-
-* Copyright 2024 PROSPERA DEFI (https://www.prosperadefi.com/)
-
-* Design and Coded by Z
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the PROSPERA DEFI DASHBOARD.
-*/
-
 import React, { useState, lazy, Suspense, useCallback, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { Box, CircularProgress } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import PropTypes from "prop-types";
-import { Routes, Route, useLocation, useRoutes, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import BottomNavBar from "../BottomNavBar";
 import TopNavBar from "../TopNavBar";
 import { DashboardUIControllerProvider } from "../../userDashboard/context";
@@ -42,26 +28,14 @@ const Section = styled(Box)({
   overflow: "hidden",
 });
 
-const UserDashboardPortal = ({ isVisible, currentSection, onInternalNavigation }) => {
-  const location = useLocation();
-  const routes = useRoutes(userDashboardRoutes);
-
+const UserDashboardPortal = ({ isVisible, currentDashboardComponent, onInternalNavigation }) => {
   if (!isVisible) return null;
 
   return ReactDOM.createPortal(
     <DashboardUIControllerProvider>
       <Suspense fallback={<CircularProgress />}>
         <UserDashboard onInternalNavigation={onInternalNavigation}>
-          <Routes>
-            {userDashboardRoutes.map((route) => (
-              <Route
-                key={route.key}
-                path={`${location.pathname}${route.route}`}
-                element={route.component}
-              />
-            ))}
-          </Routes>
-          {routes}
+          {currentDashboardComponent || <div>Select a dashboard component</div>}
         </UserDashboard>
       </Suspense>
     </DashboardUIControllerProvider>,
@@ -71,7 +45,7 @@ const UserDashboardPortal = ({ isVisible, currentSection, onInternalNavigation }
 
 UserDashboardPortal.propTypes = {
   isVisible: PropTypes.bool.isRequired,
-  currentSection: PropTypes.number.isRequired,
+  currentDashboardComponent: PropTypes.element,
   onInternalNavigation: PropTypes.func.isRequired,
 };
 
@@ -82,11 +56,8 @@ class ErrorBoundary extends React.Component {
   }
 
   static getDerivedStateFromError(error) {
+    console.error("Caught an error:", error);
     return { hasError: true };
-  }
-
-  componentDidCatch(error, errorInfo) {
-    console.error("Caught an error:", error, errorInfo);
   }
 
   render() {
@@ -104,6 +75,7 @@ ErrorBoundary.propTypes = {
 
 const AugmentedRealityController = () => {
   const [currentSection, setCurrentSection] = useState(0);
+  const [currentDashboardComponent, setCurrentDashboardComponent] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -114,29 +86,34 @@ const AugmentedRealityController = () => {
   const handleInternalNavigation = useCallback(
     (path) => {
       console.log("Navigating to:", path);
-      navigate(path);
-    },
-    [navigate]
-  );
-
-  const handleLinkClick = useCallback(
-    (path) => {
-      console.log("Link clicked in userDashboard:", path);
-      if (typeof handleInternalNavigation === "function") {
-        handleInternalNavigation(path);
+      const route = userDashboardRoutes.find(
+        (r) => r.route === path || (r.collapse && r.collapse.some((subR) => subR.route === path))
+      );
+      if (route) {
+        console.log("Found route:", route);
+        const component =
+          route.component ||
+          (route.collapse && route.collapse.find((subR) => subR.route === path).component);
+        if (component) {
+          setCurrentDashboardComponent(component);
+          setCurrentSection(1); // Ensure we're on the UserDashboard section
+        } else {
+          console.error("No component found for path:", path);
+        }
       } else {
-        console.error("handleInternalNavigation is not a function");
-        // Fallback behavior
-        navigate(path);
+        console.error("No route found for path:", path);
+        navigate("/augmented-reality"); // Fallback to main AR view if route not found
       }
     },
-    [handleInternalNavigation, navigate]
+    [navigate, userDashboardRoutes]
   );
 
   useEffect(() => {
-    // Reset to MainAR view when location changes
-    setCurrentSection(0);
-  }, [location]);
+    // Only reset to MainAR view when navigating to the augmented reality root
+    if (location.pathname === "/augmented-reality") {
+      setCurrentSection(0);
+    }
+  }, [location.pathname]);
 
   return (
     <Box sx={{ height: "100vh", width: "100vw", position: "relative", overflow: "hidden" }}>
@@ -153,7 +130,7 @@ const AugmentedRealityController = () => {
           <ErrorBoundary>
             <UserDashboardPortal
               isVisible={currentSection === 1}
-              currentSection={currentSection}
+              currentDashboardComponent={currentDashboardComponent}
               onInternalNavigation={handleInternalNavigation}
             />
           </ErrorBoundary>

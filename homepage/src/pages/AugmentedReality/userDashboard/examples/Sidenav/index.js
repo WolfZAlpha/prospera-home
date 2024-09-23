@@ -60,7 +60,12 @@ function Sidenav({ color, brand, brandName, routes, handleLinkClick, ...rest }) 
   }, [dispatch]);
 
   const handleNavigation = (path) => {
-    handleLinkClick(path);
+    if (path) {
+      console.log("Navigating to:", path);
+      handleLinkClick(path);
+    } else {
+      console.error("No path provided for navigation");
+    }
   };
 
   const renderNestedCollapse = (collapse) => {
@@ -132,7 +137,11 @@ function Sidenav({ color, brand, brandName, routes, handleLinkClick, ...rest }) 
             active={key === itemName}
             onClick={(e) => {
               e.preventDefault();
-              handleNavigation(path);
+              if (path) {
+                handleNavigation(path);
+              } else {
+                console.error("No path defined for route:", name);
+              }
             }}
           />
         );
@@ -172,8 +181,10 @@ function Sidenav({ color, brand, brandName, routes, handleLinkClick, ...rest }) 
             onClick={() => {
               if (collapse) {
                 openCollapse === name ? setOpenCollapse(false) : setOpenCollapse(name);
-              } else {
+              } else if (path) {
                 handleNavigation(path);
+              } else {
+                console.error("No path or collapse defined for route:", name);
               }
             }}
           >

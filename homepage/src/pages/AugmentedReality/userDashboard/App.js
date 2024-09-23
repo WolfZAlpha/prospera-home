@@ -88,10 +88,25 @@ function App({ onInternalNavigation }) {
       } else {
         console.error("onInternalNavigation is not a function");
         // Fallback behavior
-        navigate(path);
+        const route = routes.find(
+          (r) => r.route === path || (r.collapse && r.collapse.some((subR) => subR.route === path))
+        );
+        if (route) {
+          const component =
+            route.component ||
+            (route.collapse && route.collapse.find((subR) => subR.route === path).component);
+          if (component) {
+            navigate(path);
+          } else {
+            console.error("No component found for path:", path);
+          }
+        } else {
+          console.error("No route found for path:", path);
+          navigate("/");
+        }
       }
     },
-    [onInternalNavigation, navigate]
+    [onInternalNavigation, navigate, routes]
   );
 
   const configsButton = (

@@ -2217,3 +2217,31 @@
 {"level":"info","message":"ARBISCAN_API_KEY: Set","timestamp":"2024-09-23T19:41:14.549Z"}
 {"level":"info","message":"PROS_TOKEN_CONTRACT: Set","timestamp":"2024-09-23T19:41:14.549Z"}
 {"level":"info","message":"MIN_TOKEN_BALANCE: Set","timestamp":"2024-09-23T19:41:14.549Z"}
+{"level":"error","message":"Error: ENOENT: no such file or directory, stat '/home/z/Desktop/prospera-home/homepage/build/index.html'","timestamp":"2024-09-23T20:41:15.221Z"}
+{"level":"info","message":"TokenService - Environment variables:","timestamp":"2024-09-23T21:06:59.287Z"}
+{"level":"info","message":"ARBISCAN_API_URL: Set","timestamp":"2024-09-23T21:06:59.289Z"}
+{"level":"info","message":"ARBISCAN_API_KEY: Set","timestamp":"2024-09-23T21:06:59.289Z"}
+{"level":"info","message":"PROS_TOKEN_CONTRACT: Set","timestamp":"2024-09-23T21:06:59.289Z"}
+{"level":"info","message":"MIN_TOKEN_BALANCE: Set","timestamp":"2024-09-23T21:06:59.289Z"}
+{"level":"info","message":"Server listening on port 8080","timestamp":"2024-09-23T21:07:00.165Z"}
+{"level":"info","message":"Environment: development","timestamp":"2024-09-23T21:07:00.165Z"}
+{"level":"info","message":"DB_LINK: Set","timestamp":"2024-09-23T21:07:00.165Z"}
+{"level":"info","message":"APP_URL_CLIENT: http://localhost:3000","timestamp":"2024-09-23T21:07:00.165Z"}
+{"level":"info","message":"APP_URL_VR: undefined","timestamp":"2024-09-23T21:07:00.165Z"}
+{"level":"info","message":"CORS Whitelist: http://localhost:3000, , http://localhost:8080","timestamp":"2024-09-23T21:07:00.166Z"}
+{"level":"info","message":"API Base URL: http://localhost:8080/api","timestamp":"2024-09-23T21:07:00.166Z"}
+{"level":"info","message":"ARBISCAN_API_URL: Set","timestamp":"2024-09-23T21:07:00.166Z"}
+{"level":"info","message":"ARBISCAN_API_KEY: Set","timestamp":"2024-09-23T21:07:00.166Z"}
+{"level":"info","message":"PROS_TOKEN_CONTRACT: Set","timestamp":"2024-09-23T21:07:00.166Z"}
+{"level":"info","message":"MIN_TOKEN_BALANCE: Set","timestamp":"2024-09-23T21:07:00.166Z"}
+{"level":"error","message":"Error: ENOENT: no such file or directory, stat '/home/z/Desktop/prospera-home/homepage/build/index.html'","timestamp":"2024-09-23T21:07:13.119Z"}
+{"level":"error","message":"Error: ENOENT: no such file or directory, stat '/home/z/Desktop/prospera-home/homepage/build/index.html'","timestamp":"2024-09-23T21:12:05.333Z"}
+{"level":"error","message":"Error: ENOENT: no such file or directory, stat '/home/z/Desktop/prospera-home/homepage/build/index.html'","timestamp":"2024-09-23T21:20:39.873Z"}
+{"level":"error","message":"Error: ENOENT: no such file or directory, stat '/home/z/Desktop/prospera-home/homepage/build/index.html'","timestamp":"2024-09-23T21:22:44.112Z"}
+{"level":"error","message":"Error: ENOENT: no such file or directory, stat '/home/z/Desktop/prospera-home/homepage/build/index.html'","timestamp":"2024-09-23T21:25:00.882Z"}
+{"level":"error","message":"Error: ENOENT: no such file or directory, stat '/home/z/Desktop/prospera-home/homepage/build/index.html'","timestamp":"2024-09-23T21:25:50.624Z"}
+{"level":"error","message":"Error: ENOENT: no such file or directory, stat '/home/z/Desktop/prospera-home/homepage/build/index.html'","timestamp":"2024-09-23T21:28:52.981Z"}
+{"level":"error","message":"Error: ENOENT: no such file or directory, stat '/home/z/Desktop/prospera-home/homepage/build/index.html'","timestamp":"2024-09-23T21:31:51.527Z"}
+{"level":"error","message":"Error: ENOENT: no such file or directory, stat '/home/z/Desktop/prospera-home/homepage/build/index.html'","timestamp":"2024-09-23T21:38:16.846Z"}
+{"level":"error","message":"Error: ENOENT: no such file or directory, stat '/home/z/Desktop/prospera-home/homepage/build/index.html'","timestamp":"2024-09-23T21:50:26.428Z"}
+{"level":"error","message":"Error: ENOENT: no such file or directory, stat '/home/z/Desktop/prospera-home/homepage/build/index.html'","timestamp":"2024-09-23T21:54:10.066Z"}

@@ -48,11 +48,7 @@ const config = {
 const app = express();
 const server = http.createServer(app);
 
-const whitelist = [
-  config.clientUrl,
-  config.vrUrl,
-  config.apiUrl,
-];
+const whitelist = [config.clientUrl, config.vrUrl, config.apiUrl];
 
 const corsOptions = {
   origin: function (origin, callback) {
