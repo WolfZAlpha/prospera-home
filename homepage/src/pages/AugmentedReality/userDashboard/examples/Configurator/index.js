@@ -229,7 +229,7 @@ function Configurator() {
           <PDBox mb={2}>
             <PDButton
               component={Link}
-              href="https://www.creative-tim.com/product/Dashboard-ui-dashboard-pro-react"
+              href="https://prosperaico.com"
               target="_blank"
               rel="noreferrer"
               color="info"
@@ -242,7 +242,7 @@ function Configurator() {
           <PDBox mb={2}>
             <PDButton
               component={Link}
-              href="https://www.creative-tim.com/product/Dashboard-ui-dashboard-react"
+              href="https://prosperadefi.com"
               target="_blank"
               rel="noreferrer"
               color="dark"
@@ -254,7 +254,7 @@ function Configurator() {
           </PDBox>
           <PDButton
             component={Link}
-            href="https://www.creative-tim.com/learning-lab/react/quick-start/Dashboard-ui-dashboard/"
+            href="https://www.prosperadefi.com/documentation"
             target="_blank"
             rel="noreferrer"
             color="white"
@@ -263,17 +263,6 @@ function Configurator() {
           >
             view documentation
           </PDButton>
-        </PDBox>
-        <PDBox display="flex" justifyContent="center">
-          <GitHubButton
-            href="https://github.com/creativetimofficial/ct-Dashboard-ui-dashboard-pro-react"
-            data-icon="octicon-star"
-            data-size="large"
-            data-show-count="true"
-            aria-label="Star creativetimofficial/Dashboard-ui-dashboard-pro-react on GitHub"
-          >
-            Star
-          </GitHubButton>
         </PDBox>
         <PDBox mt={3} textAlign="center">
           <PDBox mb={0.5}>
@@ -286,7 +275,7 @@ function Configurator() {
             <PDBox mr={1.5}>
               <PDButton
                 component={Link}
-                href="https://twitter.com/intent/tweet?url=https://www.creative-tim.com/product/Dashboard-ui-dashboard-pro-react&text=Check%20Dashboard%20UI%20Dashboard%20PRO%20React%20made%20by%20@simmmple_web%20and%20@CreativeTim%20#webdesign%20#dashboard%20#react"
+                href="https://twitter.com/intent/tweet?url=https://www.prosperadefi.com"
                 target="_blank"
                 rel="noreferrer"
                 color="dark"
@@ -297,7 +286,7 @@ function Configurator() {
             </PDBox>
             <PDButton
               component={Link}
-              href="https://www.facebook.com/sharer/sharer.php?u=https://www.creative-tim.com/product/Dashboard-ui-dashboard-pro-react"
+              href="https://www.facebook.com/sharer/sharer.php?u=https://www.prosperadefi.com"
               target="_blank"
               rel="noreferrer"
               color="dark"

@@ -2245,3 +2245,51 @@
 {"level":"error","message":"Error: ENOENT: no such file or directory, stat '/home/z/Desktop/prospera-home/homepage/build/index.html'","timestamp":"2024-09-23T21:38:16.846Z"}
 {"level":"error","message":"Error: ENOENT: no such file or directory, stat '/home/z/Desktop/prospera-home/homepage/build/index.html'","timestamp":"2024-09-23T21:50:26.428Z"}
 {"level":"error","message":"Error: ENOENT: no such file or directory, stat '/home/z/Desktop/prospera-home/homepage/build/index.html'","timestamp":"2024-09-23T21:54:10.066Z"}
+{"level":"info","message":"TokenService - Environment variables:","timestamp":"2024-09-24T02:48:18.509Z"}
+{"level":"info","message":"ARBISCAN_API_URL: Set","timestamp":"2024-09-24T02:48:18.511Z"}
+{"level":"info","message":"ARBISCAN_API_KEY: Set","timestamp":"2024-09-24T02:48:18.511Z"}
+{"level":"info","message":"PROS_TOKEN_CONTRACT: Set","timestamp":"2024-09-24T02:48:18.512Z"}
+{"level":"info","message":"MIN_TOKEN_BALANCE: Set","timestamp":"2024-09-24T02:48:18.512Z"}
+{"level":"info","message":"Server listening on port 8080","timestamp":"2024-09-24T02:48:19.399Z"}
+{"level":"info","message":"Environment: development","timestamp":"2024-09-24T02:48:19.400Z"}
+{"level":"info","message":"DB_LINK: Set","timestamp":"2024-09-24T02:48:19.400Z"}
+{"level":"info","message":"APP_URL_CLIENT: http://localhost:3000","timestamp":"2024-09-24T02:48:19.400Z"}
+{"level":"info","message":"APP_URL_VR: undefined","timestamp":"2024-09-24T02:48:19.400Z"}
+{"level":"info","message":"CORS Whitelist: http://localhost:3000, , http://localhost:8080","timestamp":"2024-09-24T02:48:19.400Z"}
+{"level":"info","message":"API Base URL: http://localhost:8080/api","timestamp":"2024-09-24T02:48:19.400Z"}
+{"level":"info","message":"ARBISCAN_API_URL: Set","timestamp":"2024-09-24T02:48:19.400Z"}
+{"level":"info","message":"ARBISCAN_API_KEY: Set","timestamp":"2024-09-24T02:48:19.400Z"}
+{"level":"info","message":"PROS_TOKEN_CONTRACT: Set","timestamp":"2024-09-24T02:48:19.400Z"}
+{"level":"info","message":"MIN_TOKEN_BALANCE: Set","timestamp":"2024-09-24T02:48:19.400Z"}
+{"level":"info","message":"TokenService - Environment variables:","timestamp":"2024-09-24T03:05:10.666Z"}
+{"level":"info","message":"ARBISCAN_API_URL: Set","timestamp":"2024-09-24T03:05:10.667Z"}
+{"level":"info","message":"ARBISCAN_API_KEY: Set","timestamp":"2024-09-24T03:05:10.668Z"}
+{"level":"info","message":"PROS_TOKEN_CONTRACT: Set","timestamp":"2024-09-24T03:05:10.668Z"}
+{"level":"info","message":"MIN_TOKEN_BALANCE: Set","timestamp":"2024-09-24T03:05:10.668Z"}
+{"level":"info","message":"Server listening on port 8080","timestamp":"2024-09-24T03:05:11.492Z"}
+{"level":"info","message":"Environment: development","timestamp":"2024-09-24T03:05:11.492Z"}
+{"level":"info","message":"DB_LINK: Set","timestamp":"2024-09-24T03:05:11.492Z"}
+{"level":"info","message":"APP_URL_CLIENT: http://localhost:3000","timestamp":"2024-09-24T03:05:11.492Z"}
+{"level":"info","message":"APP_URL_VR: undefined","timestamp":"2024-09-24T03:05:11.493Z"}
+{"level":"info","message":"CORS Whitelist: http://localhost:3000, , http://localhost:8080, https://prosperadefi.com","timestamp":"2024-09-24T03:05:11.493Z"}
+{"level":"info","message":"API Base URL: http://localhost:8080/api","timestamp":"2024-09-24T03:05:11.493Z"}
+{"level":"info","message":"ARBISCAN_API_URL: Set","timestamp":"2024-09-24T03:05:11.493Z"}
+{"level":"info","message":"ARBISCAN_API_KEY: Set","timestamp":"2024-09-24T03:05:11.493Z"}
+{"level":"info","message":"PROS_TOKEN_CONTRACT: Set","timestamp":"2024-09-24T03:05:11.493Z"}
+{"level":"info","message":"MIN_TOKEN_BALANCE: Set","timestamp":"2024-09-24T03:05:11.493Z"}
+{"level":"info","message":"TokenService - Environment variables:","timestamp":"2024-09-24T03:24:16.544Z"}
+{"level":"info","message":"ARBISCAN_API_URL: Set","timestamp":"2024-09-24T03:24:16.545Z"}
+{"level":"info","message":"ARBISCAN_API_KEY: Set","timestamp":"2024-09-24T03:24:16.546Z"}
+{"level":"info","message":"PROS_TOKEN_CONTRACT: Set","timestamp":"2024-09-24T03:24:16.546Z"}
+{"level":"info","message":"MIN_TOKEN_BALANCE: Set","timestamp":"2024-09-24T03:24:16.546Z"}
+{"level":"info","message":"Server listening on port 8080","timestamp":"2024-09-24T03:24:17.407Z"}
+{"level":"info","message":"Environment: development","timestamp":"2024-09-24T03:24:17.407Z"}
+{"level":"info","message":"DB_LINK: Set","timestamp":"2024-09-24T03:24:17.408Z"}
+{"level":"info","message":"APP_URL_CLIENT: http://localhost:3000","timestamp":"2024-09-24T03:24:17.408Z"}
+{"level":"info","message":"APP_URL_VR: undefined","timestamp":"2024-09-24T03:24:17.408Z"}
+{"level":"info","message":"CORS Whitelist: http://localhost:3000, , http://localhost:8080, https://prosperadefi.com","timestamp":"2024-09-24T03:24:17.408Z"}
+{"level":"info","message":"API Base URL: http://localhost:8080/api","timestamp":"2024-09-24T03:24:17.408Z"}
+{"level":"info","message":"ARBISCAN_API_URL: Set","timestamp":"2024-09-24T03:24:17.408Z"}
+{"level":"info","message":"ARBISCAN_API_KEY: Set","timestamp":"2024-09-24T03:24:17.408Z"}
+{"level":"info","message":"PROS_TOKEN_CONTRACT: Set","timestamp":"2024-09-24T03:24:17.408Z"}
+{"level":"info","message":"MIN_TOKEN_BALANCE: Set","timestamp":"2024-09-24T03:24:17.408Z"}

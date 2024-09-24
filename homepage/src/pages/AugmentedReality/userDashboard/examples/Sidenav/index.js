@@ -23,7 +23,6 @@ import PDTypography from "../../components/PDTypography";
 import SidenavCollapse from "./SidenavCollapse";
 import SidenavList from "./SidenavList";
 import SidenavItem from "./SidenavItem";
-import SidenavCard from "./SidenavCard";
 import SimmmpleLogo from "../Icons/SimmmpleLogo";
 import SidenavRoot from "./SidenavRoot";
 import sidenavLogoLabel from "./styles/sidenav";
@@ -287,9 +286,6 @@ function Sidenav({ color, brand, brandName, routes, handleLinkClick, ...rest }) 
             <Divider light />
           </PDBox>
           <List sx={{ mb: "auto" }}>{renderRoutes}</List>
-          <PDBox pt={2} mx={2} mb={2}>
-            <SidenavCard />
-          </PDBox>
         </PDBox>
       </Scrollbars>
     </SidenavRoot>

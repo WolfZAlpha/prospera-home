@@ -48,7 +48,7 @@ const config = {
 const app = express();
 const server = http.createServer(app);
 
-const whitelist = [config.clientUrl, config.vrUrl, config.apiUrl];
+const whitelist = [config.clientUrl, config.vrUrl, config.apiUrl, 'https://prosperadefi.com'];
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -60,9 +60,11 @@ const corsOptions = {
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Accept", "Authorization", "Cache-Control", "Content-Type", "DNT", "If-Modified-Since", "Keep-Alive", "Origin", "User-Agent", "X-Requested-With"],
   exposedHeaders: ["set-cookie"],
 };
+
+app.use(cors(corsOptions));
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -76,7 +78,6 @@ const startServer = async () => {
     await dbConnect();
 
     app.use(helmet());
-    app.use(cors(corsOptions));
     app.use(
       bodyParser.json({ type: "application/vnd.api+json", strict: false })
     );
