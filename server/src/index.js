@@ -48,7 +48,12 @@ const config = {
 const app = express();
 const server = http.createServer(app);
 
-const whitelist = [config.clientUrl, config.vrUrl, config.apiUrl, 'https://prosperadefi.com'];
+const whitelist = [
+  config.clientUrl,
+  config.vrUrl,
+  config.apiUrl,
+  "https://prosperadefi.com",
+];
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -60,7 +65,18 @@ const corsOptions = {
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-  allowedHeaders: ["Accept", "Authorization", "Cache-Control", "Content-Type", "DNT", "If-Modified-Since", "Keep-Alive", "Origin", "User-Agent", "X-Requested-With"],
+  allowedHeaders: [
+    "Accept",
+    "Authorization",
+    "Cache-Control",
+    "Content-Type",
+    "DNT",
+    "If-Modified-Since",
+    "Keep-Alive",
+    "Origin",
+    "User-Agent",
+    "X-Requested-With",
+  ],
   exposedHeaders: ["set-cookie"],
 };
 
