@@ -110,7 +110,7 @@ const startServer = async () => {
     });
 
     // API routes
-    app.use("/api", routes);
+    app.use("/", routes);
 
     // Serve static files for different parts of the application
     app.use(express.static(path.join(__dirname, "../../homepage/build")));
@@ -141,7 +141,7 @@ const startServer = async () => {
       logger.info(`APP_URL_CLIENT: ${config.clientUrl}`);
       logger.info(`APP_URL_VR: ${config.vrUrl}`);
       logger.info(`CORS Whitelist: ${whitelist.join(", ")}`);
-      logger.info(`API Base URL: ${config.apiUrl}/api`);
+      logger.info(`API Base URL: ${config.apiUrl}`);
 
       // Log Arbiscan-related environment variables
       logger.info(

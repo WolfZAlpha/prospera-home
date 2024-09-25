@@ -23,7 +23,7 @@ export const BetaProvider = ({ children }) => {
 
   const checkWhitelistStatus = async () => {
     try {
-      const response = await axios.get(`${config.apiUrl}/api/v1/users/${user.id}/whitelist-status`);
+      const response = await axios.get(`${config.apiUrl}/v1/users/${user.id}/whitelist-status`);
       setIsWhitelisted(response.data.isWhitelisted);
       setHasRequestedWhitelist(response.data.whitelistStatus === "requested");
     } catch (error) {
@@ -59,7 +59,7 @@ export const BetaProvider = ({ children }) => {
       const holdsSufficientPROS = await checkTokenHolding(arbitrumWallet);
       if (holdsSufficientPROS) {
         const response = await axios.post(
-          `${config.apiUrl}/api/v1/users/${user.id}/request-whitelist`,
+          `${config.apiUrl}/v1/users/${user.id}/request-whitelist`,
           {
             arbitrumWallet,
           }
@@ -80,7 +80,7 @@ export const BetaProvider = ({ children }) => {
 
   const toggleBetaMode = async (value) => {
     try {
-      await axios.post(`${config.apiUrl}/api/v1/admin/toggle-beta-mode`, { isBetaMode: value });
+      await axios.post(`${config.apiUrl}/v1/admin/toggle-beta-mode`, { isBetaMode: value });
       setIsBetaMode(value);
     } catch (error) {
       console.error("Error toggling beta mode:", error);
