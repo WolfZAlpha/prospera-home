@@ -43,6 +43,7 @@ import AboutUs from "layouts/pages/company/about-us";
 import ContactUs from "layouts/pages/support/contact-us";
 import Faq from "layouts/pages/support/faq";
 import Privacy from "layouts/pages/support/privacy";
+import AugmentedRealityPage from "layouts/pages/augmented-reality";
 
 // Account
 import SignInIllustration from "layouts/authentication/sign-in/illustration";
@@ -83,6 +84,18 @@ const routes = [
             name: "privacy",
             route: "/pages/support/privacy",
             component: <Privacy />,
+          },
+        ],
+      },
+      {
+        name: "Augmented Reality",
+        key: "augmented-reality",
+        collapse: [
+          {
+            name: "Augmented Reality",
+            key: "augmented-reality",
+            route: "/augmented-reality/*",
+            component: <AugmentedRealityPage />,
           },
         ],
       },

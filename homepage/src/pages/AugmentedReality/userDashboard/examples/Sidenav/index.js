@@ -23,6 +23,7 @@ import PDTypography from "../../components/PDTypography";
 import SidenavCollapse from "./SidenavCollapse";
 import SidenavList from "./SidenavList";
 import SidenavItem from "./SidenavItem";
+import SidenavCard from "./SidenavCard";
 import SimmmpleLogo from "../Icons/SimmmpleLogo";
 import SidenavRoot from "./SidenavRoot";
 import sidenavLogoLabel from "./styles/sidenav";
@@ -59,12 +60,7 @@ function Sidenav({ color, brand, brandName, routes, handleLinkClick, ...rest }) 
   }, [dispatch]);
 
   const handleNavigation = (path) => {
-    if (path) {
-      console.log("Navigating to:", path);
-      handleLinkClick(path);
-    } else {
-      console.error("No path provided for navigation");
-    }
+    handleLinkClick(path);
   };
 
   const renderNestedCollapse = (collapse) => {
@@ -136,11 +132,7 @@ function Sidenav({ color, brand, brandName, routes, handleLinkClick, ...rest }) 
             active={key === itemName}
             onClick={(e) => {
               e.preventDefault();
-              if (path) {
-                handleNavigation(path);
-              } else {
-                console.error("No path defined for route:", name);
-              }
+              handleNavigation(path);
             }}
           />
         );
@@ -180,10 +172,8 @@ function Sidenav({ color, brand, brandName, routes, handleLinkClick, ...rest }) 
             onClick={() => {
               if (collapse) {
                 openCollapse === name ? setOpenCollapse(false) : setOpenCollapse(name);
-              } else if (path) {
-                handleNavigation(path);
               } else {
-                console.error("No path or collapse defined for route:", name);
+                handleNavigation(path);
               }
             }}
           >
@@ -286,6 +276,9 @@ function Sidenav({ color, brand, brandName, routes, handleLinkClick, ...rest }) 
             <Divider light />
           </PDBox>
           <List sx={{ mb: "auto" }}>{renderRoutes}</List>
+          <PDBox pt={2} mx={2} mb={2}>
+            <SidenavCard />
+          </PDBox>
         </PDBox>
       </Scrollbars>
     </SidenavRoot>

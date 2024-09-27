@@ -31,6 +31,10 @@ const config = {
     process.env.NODE_ENV === "development"
       ? process.env.APP_URL_CLIENT_DEV
       : process.env.APP_URL_CLIENT,
+  dashboardUrl:
+    process.env.NODE_ENV === "development"
+      ? process.env.APP_URL_DASHBOARD_DEV
+      : process.env.APP_URL_DASHBOARD,
   vrUrl:
     process.env.NODE_ENV === "development"
       ? process.env.APP_URL_VR_DEV
@@ -39,6 +43,10 @@ const config = {
     process.env.NODE_ENV === "development"
       ? process.env.APP_URL_API_DEV
       : process.env.APP_URL_API,
+  teamDashboardUrl:
+    process.env.NODE_ENV === "development"
+      ? process.env.APP_URL_TEAMDASHBOARD_DEV
+      : process.env.APP_URL_TEAMDASHBOARD,
   arbiscanApiUrl: process.env.ARBISCAN_API_URL,
   arbiscanApiKey: process.env.ARBISCAN_API_KEY,
   prosTokenContract: process.env.PROS_TOKEN_CONTRACT,
@@ -50,9 +58,10 @@ const server = http.createServer(app);
 
 const whitelist = [
   config.clientUrl,
+  config.dashboardUrl,
   config.vrUrl,
   config.apiUrl,
-  "https://prosperadefi.com",
+  config.teamDashboardUrl,
 ];
 
 const corsOptions = {
@@ -65,22 +74,9 @@ const corsOptions = {
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-  allowedHeaders: [
-    "Accept",
-    "Authorization",
-    "Cache-Control",
-    "Content-Type",
-    "DNT",
-    "If-Modified-Since",
-    "Keep-Alive",
-    "Origin",
-    "User-Agent",
-    "X-Requested-With",
-  ],
+  allowedHeaders: ["Content-Type", "Authorization"],
   exposedHeaders: ["set-cookie"],
 };
-
-app.use(cors(corsOptions));
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -94,6 +90,7 @@ const startServer = async () => {
     await dbConnect();
 
     app.use(helmet());
+    app.use(cors(corsOptions));
     app.use(
       bodyParser.json({ type: "application/vnd.api+json", strict: false })
     );
@@ -110,10 +107,29 @@ const startServer = async () => {
     });
 
     // API routes
-    app.use("/", routes);
+    app.use("/api", routes);
 
     // Serve static files for different parts of the application
     app.use(express.static(path.join(__dirname, "../../homepage/build")));
+    app.use(
+      "/team-dashboard",
+      express.static(path.join(__dirname, "../../team-dashboard/build"))
+    );
+    app.use(
+      "/dashboard",
+      express.static(path.join(__dirname, "../../dashboard/build"))
+    );
+
+    // Handle routes for different parts of the application
+    app.get(["/team-dashboard", "/team-dashboard/*"], (req, res) => {
+      res.sendFile(
+        path.join(__dirname, "../../team-dashboard/build/index.html")
+      );
+    });
+
+    app.get(["/dashboard", "/dashboard/*"], (req, res) => {
+      res.sendFile(path.join(__dirname, "../../dashboard/build/index.html"));
+    });
 
     app.get(["/ar", "/ar/*"], (req, res) => {
       res.sendFile(path.join(__dirname, "../../homepage/build/index.html"));
@@ -139,9 +155,11 @@ const startServer = async () => {
       logger.info(`Environment: ${process.env.NODE_ENV}`);
       logger.info(`DB_LINK: ${config.dbLink ? "Set" : "Not set"}`);
       logger.info(`APP_URL_CLIENT: ${config.clientUrl}`);
+      logger.info(`APP_URL_DASHBOARD: ${config.dashboardUrl}`);
       logger.info(`APP_URL_VR: ${config.vrUrl}`);
+      logger.info(`APP_URL_TEAMDASHBOARD: ${config.teamDashboardUrl}`);
       logger.info(`CORS Whitelist: ${whitelist.join(", ")}`);
-      logger.info(`API Base URL: ${config.apiUrl}`);
+      logger.info(`API Base URL: ${config.apiUrl}/api`);
 
       // Log Arbiscan-related environment variables
       logger.info(

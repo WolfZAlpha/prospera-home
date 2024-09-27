@@ -26,7 +26,7 @@ api.interceptors.request.use(
 
 export const fetchUserData = async (userId) => {
   try {
-    const response = await api.get(`/v1/users/${userId}`);
+    const response = await api.get(`/api/v1/users/${userId}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching user data:", error);
@@ -36,7 +36,7 @@ export const fetchUserData = async (userId) => {
 
 export const checkTokenHolding = async (arbitrumWallet) => {
   try {
-    const response = await api.get(`/v1/wallet/${arbitrumWallet}/token-holding`);
+    const response = await api.get(`/api/v1/wallet/${arbitrumWallet}/token-holding`);
     return response.data.hasTokens;
   } catch (error) {
     console.error("Error checking token holding:", error);
@@ -46,7 +46,7 @@ export const checkTokenHolding = async (arbitrumWallet) => {
 
 export const getTokenBalance = async (arbitrumWallet) => {
   try {
-    const response = await api.get(`/v1/wallet/balance/${arbitrumWallet}`);
+    const response = await api.get(`/api/v1/wallet/balance/${arbitrumWallet}`);
     return response.data.balance;
   } catch (error) {
     console.error("Error getting token balance:", error);
@@ -56,10 +56,10 @@ export const getTokenBalance = async (arbitrumWallet) => {
 
 export const registerUser = async (userData) => {
   try {
-    console.log("Sending registration request to:", `${API_URL}/v1/auth/register`);
+    console.log("Sending registration request to:", `${API_URL}/api/v1/auth/register`);
     console.log("Registration data:", userData);
 
-    const response = await api.post("/v1/auth/register", userData);
+    const response = await api.post("/api/v1/auth/register", userData);
 
     console.log("Registration response:", response.data);
     return response.data;
@@ -72,7 +72,7 @@ export const registerUser = async (userData) => {
 
 export const loginUser = async (credentials) => {
   try {
-    const response = await api.post("/v1/auth/login", credentials);
+    const response = await api.post("/api/v1/auth/login", credentials);
     return response.data;
   } catch (error) {
     console.error("Error logging in:", error);
@@ -82,7 +82,7 @@ export const loginUser = async (credentials) => {
 
 export const logoutUser = async () => {
   try {
-    const response = await api.post("/v1/auth/logout");
+    const response = await api.post("/api/v1/auth/logout");
     localStorage.removeItem("token");
     return response.data;
   } catch (error) {
@@ -93,7 +93,7 @@ export const logoutUser = async () => {
 
 export const forgotPassword = async (email) => {
   try {
-    const response = await api.post("/v1/auth/password-forgot", { email });
+    const response = await api.post("/api/v1/auth/password-forgot", { email });
     return response.data;
   } catch (error) {
     console.error("Error requesting password reset:", error);

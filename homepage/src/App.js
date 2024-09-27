@@ -12,7 +12,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the PROSPERA DEFI PLATFORM.
 */
 
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -23,9 +23,9 @@ import AugmentedReality from "pages/AugmentedReality";
 import { AuthProvider } from "contexts/AuthContext";
 import { WalletProvider } from "contexts/WalletContext";
 import { BetaProvider } from "contexts/BetaContext";
-import { DashboardUIControllerProvider } from "pages/AugmentedReality/userDashboard/context";
+import PropTypes from "prop-types";
 
-const App = () => {
+export default function App() {
   const { pathname } = useLocation();
   const isAugmentedRealitySubdomain =
     window.location.hostname === "ar.prosperadefi.com" ||
@@ -37,52 +37,43 @@ const App = () => {
   }, [pathname]);
 
   const getRoutes = (allRoutes) =>
-    allRoutes
-      .flatMap((route) => {
-        if (route.collapse) {
-          return getRoutes(route.collapse);
-        }
+    allRoutes.map((route) => {
+      if (route.collapse) {
+        return getRoutes(route.collapse);
+      }
 
-        if (route.route) {
-          return (
-            <Route
-              exact
-              path={route.route}
-              element={route.component}
-              key={route.key || route.route}
-            />
-          );
-        }
+      if (route.route) {
+        return <Route exact path={route.route} element={route.component} key={route.key} />;
+      }
 
-        return null;
-      })
-      .filter(Boolean);
+      return null;
+    });
 
   return (
     <AuthProvider>
       <WalletProvider>
         <BetaProvider>
-          <DashboardUIControllerProvider>
-            <ThemeProvider theme={theme}>
-              <CssBaseline />
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            {isAugmentedRealitySubdomain ? (
               <Routes>
-                {isAugmentedRealitySubdomain ? (
-                  <Route path="/*" element={<AugmentedReality />} />
-                ) : (
-                  <>
-                    {getRoutes(routes)}
-                    <Route path="/home" element={<Home />} />
-                    <Route path="/pages/augmented-reality/*" element={<AugmentedReality />} />
-                    <Route path="*" element={<Navigate to="/home" />} />
-                  </>
-                )}
+                <Route path="/*" element={<AugmentedReality />} />
               </Routes>
-            </ThemeProvider>
-          </DashboardUIControllerProvider>
+            ) : (
+              <Routes>
+                {getRoutes(routes)}
+                <Route path="/home" element={<Home />} />
+                <Route path="/pages/augmented-reality/*" element={<AugmentedReality />} />
+                <Route path="*" element={<Navigate to="/home" />} />
+              </Routes>
+            )}
+          </ThemeProvider>
         </BetaProvider>
       </WalletProvider>
     </AuthProvider>
   );
-};
+}
 
-export default App;
+App.propTypes = {
+  onInternalNavigation: PropTypes.func.isRequired,
+};
